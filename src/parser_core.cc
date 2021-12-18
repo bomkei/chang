@@ -23,8 +23,8 @@ Node* Parser::mul() {
   auto node = primary();
 
   while( check() ) {
-    if( consume("*") ) node = new Node(NODE_MUL, node, primary());
-    else if( consume("/") ) node = new Node(NODE_DIV, node, primary());
+    if( consume("*") ) node = new Node(NODE_MUL, node, primary(), consumed);
+    else if( consume("/") ) node = new Node(NODE_DIV, node, primary(), consumed);
     else break;
   }
 
@@ -35,8 +35,8 @@ Node* Parser::add() {
   auto node = mul();
 
   while( check() ) {
-    if( consume("+") ) node = new Node(NODE_ADD, node, mul());
-    else if( consume("-") ) node = new Node(NODE_SUB, node, mul());
+    if( consume("+") ) node = new Node(NODE_ADD, node, mul(), consumed);
+    else if( consume("-") ) node = new Node(NODE_SUB, node, mul(), consumed);
     else break;
   }
 

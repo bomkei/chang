@@ -103,6 +103,7 @@ enum NodeKind {
   NODE_SUB,
   NODE_MUL,
   NODE_DIV,
+  NODE_SCOPE,
 
   NODE_VALUE,
 };
@@ -113,6 +114,8 @@ struct Node {
   Node* lhs;
   Node* rhs;
   Object obj;
+  std::vector<Node*> list;
+  std::vector<Object> objects;
 
   Node(NodeKind kind)
     : kind(kind) {
