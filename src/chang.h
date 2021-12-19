@@ -194,6 +194,8 @@ private:
   void expect(char const*, bool = true);
   void expect_ident();
 
+  Node* semicolon(Node* node);
+
   Token* token;
   Token* consumed;
 

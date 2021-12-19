@@ -2,6 +2,23 @@
 
 Node* Parser::primary() {
   
+  if( consume("{") ) {
+    auto node = new Node(NODE_SCOPE);
+    auto closed = false;
+
+    node->token = consumed;
+
+    while( check() && !(closed = consume("}")) ) {
+      node->list.emplace_back(semicolon(expr()));
+    }
+
+    if( !closed ) {
+      error(ERR_SYNTAX, node->token, "not closed");
+    }
+
+    return node;
+  }
+
   switch( token->kind ) {
     case TOK_INT: {
       auto node = new Node(NODE_VALUE);
@@ -61,7 +78,7 @@ Node* Parser::top() {
     expect(")");
 
     expect("{", false);
-    node->
+    node->code = expr();
     
 
     return node;

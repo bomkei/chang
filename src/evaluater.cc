@@ -8,6 +8,14 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_VALUE:
       return node->obj.type;
     
+    case NODE_FUNCTION: {
+
+    }
+
+    case NODE_SCOPE: {
+      
+    }
+
     default: {
       auto lhs = evaluate(node->lhs);
       auto rhs = evaluate(node->rhs);

@@ -26,3 +26,16 @@ Node* Parser::expect_type() {
 
   return node;
 }
+
+Node* Parser::semicolon(Node* node) {
+  switch( node->kind ) {
+    case NODE_SCOPE:
+    case NODE_FUNCTION:
+      break;
+
+    default:
+      expect(";");
+  }
+
+  return node;
+}
