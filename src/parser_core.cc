@@ -46,3 +46,22 @@ Node* Parser::add() {
 Node* Parser::expr() {
   return add();
 }
+
+Node* Parser::top() {
+  if( consume("fn") ) {
+    auto node = new Node(NODE_FUNCTION);
+
+    expect_ident();
+    node->func_name = token->str;
+
+    next();
+    expect("(");
+
+    
+
+    return node;
+  }
+
+  error(ERR_PARSE, token, "expected function declare");
+  exit(1);
+}

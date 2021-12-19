@@ -37,7 +37,7 @@ Token* Lexer::lex() {
         }
       }
 
-      error(ERR_LEXER, cur, "unknown token");
+      error(ERR_LEX, cur, "unknown token");
     such_op:;
     }
 

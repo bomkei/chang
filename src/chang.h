@@ -103,7 +103,12 @@ enum NodeKind {
   NODE_SUB,
   NODE_MUL,
   NODE_DIV,
+  NODE_ASSIGN,
+
+  NODE_VAR,
   NODE_SCOPE,
+
+  NODE_FUNCTION,
 
   NODE_VALUE,
 };
@@ -116,6 +121,9 @@ struct Node {
   Object obj;
   std::vector<Node*> list;
   std::vector<Object> objects;
+
+  std::string_view func_name;
+
 
   Node(NodeKind kind)
     : kind(kind) {
@@ -157,13 +165,14 @@ public:
   Node* mul();
   Node* add();
   Node* expr();
-
+  Node* top();
 
 private:
   void next();
   bool check();
   bool consume(char const*);
   void expect(char const*, bool = true);
+  void expect_ident();
 
   Token* token;
   Token* consumed;
@@ -186,7 +195,8 @@ private:
 };
 
 enum ErrorKind {
-  ERR_LEXER,
+  ERR_LEX,
+  ERR_PARSE,
   ERR_SYNTAX,
   ERR_EXPECTED,
   ERR_TYPE
