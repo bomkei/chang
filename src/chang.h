@@ -108,7 +108,21 @@ enum NodeKind {
   NODE_VAR,
   NODE_SCOPE,
 
+  // Type
+  //  name = type name
+  //  
+  NODE_TYPE,
+
+  // Function
+  //  name = function name
+  //  list = arguments (NODE_ARGUMENT)
+  //  code = code
   NODE_FUNCTION,
+
+  // Argument
+  //  name = argument name
+  //  type = type
+  NODE_ARGUMENT,
 
   NODE_VALUE,
 };
@@ -122,8 +136,11 @@ struct Node {
   std::vector<Node*> list;
   std::vector<Object> objects;
 
-  std::string_view func_name;
+  std::string_view name;
+  Node* type;
+  Node* code;
 
+  bool evaluated = false;
 
   Node(NodeKind kind)
     : kind(kind) {
@@ -161,6 +178,9 @@ public:
 
   Node* parse();
 
+  Node* expect_argument();
+  Node* expect_type();
+
   Node* primary();
   Node* mul();
   Node* add();
@@ -176,6 +196,8 @@ private:
 
   Token* token;
   Token* consumed;
+
+  std::vector<Node*> parsed_types;
 };
 
 class Evaluater {

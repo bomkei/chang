@@ -52,11 +52,16 @@ Node* Parser::top() {
     auto node = new Node(NODE_FUNCTION);
 
     expect_ident();
-    node->func_name = token->str;
+    node->name = token->str;
 
     next();
     expect("(");
 
+    // todo: read args
+    expect(")");
+
+    expect("{", false);
+    node->
     
 
     return node;
