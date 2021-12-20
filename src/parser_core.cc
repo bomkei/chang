@@ -63,16 +63,25 @@ Node* Parser::mul() {
 Node* Parser::add() {
   auto node = mul();
 
+/*
   while( check() ) {
     if( consume("+") ) node = new Node(NODE_ADD, node, mul(), consumed);
     else if( consume("-") ) node = new Node(NODE_SUB, node, mul(), consumed);
     else break;
+  }*/
+
+  if( token->str == "+" || token->str == "-" ) {
+    auto expr = new Node(
   }
 
   return node;
 }
 
 Node* Parser::expr() {
+  if( consume("var") ) {
+
+  }
+
   return add();
 }
 
@@ -94,7 +103,7 @@ Node* Parser::top() {
     expect(")");
 
     expect("{", false);
-    node->code = expr();
+    node->expr = expr();
     
 
     return node;

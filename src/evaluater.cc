@@ -34,7 +34,7 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_FUNCTION: {
-      ret = evaluate(node->code);
+      ret = evaluate(node->expr);
       break;
     }
 

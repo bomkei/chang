@@ -1,10 +1,10 @@
 #pragma
 
+#include <concepts>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <concepts>
 
 #define  __DEBUG__  1
 
@@ -99,24 +99,26 @@ struct Object {
 };
 
 enum NodeKind {
-  NODE_ADD,
-  NODE_SUB,
-  NODE_MUL,
-  NODE_DIV,
+  NODE_EXPR,
   NODE_ASSIGN,
 
+  // Variable Declaration
+  //  name = variable name
+  //  expr = initializer expr
   NODE_VAR,
+
+  // Scope
+  //  list = elements
   NODE_SCOPE,
 
   // Type
   //  name = type name
-  //  
   NODE_TYPE,
 
   // Function
   //  name = function name
   //  list = arguments (NODE_ARGUMENT)
-  //  code = code
+  //  expr = code of function
   NODE_FUNCTION,
 
   // Argument
@@ -127,7 +129,19 @@ enum NodeKind {
   NODE_VALUE,
 };
 
+enum ExprKind {
+  EXPR_ADD,
+  EXPR_SUB,
+  EXPR_MUL,
+  EXPR_DIV,
+};
+
 struct Node {
+  struct ExprPair {
+    ExprKind kind;
+    Node* item;
+  };
+
   NodeKind kind;
   Token* token;
   Node* lhs;
@@ -135,13 +149,18 @@ struct Node {
   Object obj;
   std::vector<Node*> list;
   std::vector<Object> objects;
+  std::vector<ExprPair> expr_list;
 
   std::string_view name;
   Node* type;
-  Node* code;
+  Node* expr;
 
   bool evaluated = false;
   ObjectType objtype;
+
+  // if self is NODE_VAR, this is can use to check if placed self on allowed area.
+  // example for, root in scope.
+  bool is_allowed_let = false;
 
   Node(NodeKind kind)
     : kind(kind) {

@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
   Interpreter runner;
   alert;
-  std::cout << runner.run_node(global.entry_point->code) << std::endl;
+  std::cout << runner.run_node(global.entry_point->expr) << std::endl;
 
 
 }

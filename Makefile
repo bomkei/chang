@@ -24,9 +24,11 @@ debug:
 install:
 	@echo todo
 
-$(BUILD)/%.o: $(SRCDIR)/%.cc
+$(BUILD)/%.o: $(SRCDIR)/%.cc $(HEADER)
+	@echo $(notdir $<)
 	@[ -d $(BUILD) ] || mkdir -p $(BUILD)
-	clang++ $(CXXFLAGS) -c -o $@ $<
+	@clang++ $(CXXFLAGS) -c -o $@ $<
 
 $(TARGET): $(OFILES)
-	clang++ $(LDFLAGS) -o $@ $^
+	@echo linking...
+	@clang++ $(LDFLAGS) -o $@ $^
