@@ -20,20 +20,24 @@ Object Interpreter::run_node(Node* node) {
       return obj;
     }
 
-    default: {
-      auto lhs = run_node(node->lhs);
-      auto rhs = run_node(node->rhs);
+    case NODE_VAR: {
 
-      switch( node->kind ) {
-        case NODE_ADD: {
-          lhs.v_int += rhs.v_int;
-          break;
+      break;
+    }
+
+    case NODE_EXPR: {
+      auto obj = run_node(node->expr);
+
+      for( auto&& pair : node->expr_list ) {
+        auto&& item = run_node(pair.item);
+
+        switch( pair.kind ) {
+          case EXPR_ADD:
+            
         }
-
-
       }
 
-      return lhs;
+      return obj;
     }
   }
 

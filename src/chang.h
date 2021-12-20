@@ -257,4 +257,17 @@ struct Global {
   static Global* get_instance();
 };
 
+class Driver {
+public:
+  Driver();
+  ~Driver();
+
+  bool parse_arguments(int argc, char** argv);
+
+  int main(int argc, char** argv);
+
+private:
+
+};
+
 void error(ErrorKind kind, Token* token, char const* fmt, ...);

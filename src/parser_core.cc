@@ -51,10 +51,24 @@ Node* Parser::primary() {
 Node* Parser::mul() {
   auto node = primary();
 
-  while( check() ) {
-    if( consume("*") ) node = new Node(NODE_MUL, node, primary(), consumed);
-    else if( consume("/") ) node = new Node(NODE_DIV, node, primary(), consumed);
-    else break;
+  if( token->str == "*" || token->str == "/" ) {
+    auto expr = new Node(NODE_EXPR);
+    expr->expr = node;
+
+    while( check() ) {
+      ExprKind kind;
+
+      if( consume("*") )
+        kind = EXPR_MUL;
+      else if( consume("/") )
+        kind = EXPR_DIV;
+      else
+        break;
+
+      expr->expr_list.emplace_back(Node::ExprPair{ kind, primary() });
+    }
+
+    return expr;
   }
 
   return node;
@@ -63,15 +77,24 @@ Node* Parser::mul() {
 Node* Parser::add() {
   auto node = mul();
 
-/*
-  while( check() ) {
-    if( consume("+") ) node = new Node(NODE_ADD, node, mul(), consumed);
-    else if( consume("-") ) node = new Node(NODE_SUB, node, mul(), consumed);
-    else break;
-  }*/
-
   if( token->str == "+" || token->str == "-" ) {
-    auto expr = new Node(
+    auto expr = new Node(NODE_EXPR);
+    expr->expr = node;
+
+    while( check() ) {
+      ExprKind kind;
+
+      if( consume("+") )
+        kind = EXPR_ADD;
+      else if( consume("-") )
+        kind = EXPR_SUB;
+      else
+        break;
+      
+      expr->expr_list.emplace_back(Node::ExprPair{ kind, mul() });
+    }
+
+    return expr;
   }
 
   return node;
