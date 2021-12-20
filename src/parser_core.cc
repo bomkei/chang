@@ -4,7 +4,6 @@ Node* Parser::primary() {
   
   if( consume("{") ) {
     auto node = new Node(NODE_SCOPE);
-    auto closed = false;
 
     node->token = consumed;
 
@@ -12,12 +11,21 @@ Node* Parser::primary() {
       return node;
     }
 
-    do {
-      
-    } while( );
+    while( check() ) {
+      node->list.emplace_back(expr());
 
-    if( !closed ) {
-      error(ERR_SYNTAX, node->token, "not closed");
+      if( consume(";") ) {
+        if( token->str == "}" ) {
+          error(ERR_UNEXPECTED, token, "unexpected character '}'");
+          error(ERR_NOTE, consumed, "semicolon is not needed at last of scope. maybe did you forget remove it?");
+          exit(1);
+        }
+
+        continue;
+      }
+
+      expect("}");
+      break;
     }
 
     return node;

@@ -39,10 +39,10 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_SCOPE: {
-      for( auto&& item : node->list ) {
-        ret = evaluate(item);
-      }
-
+      if( node->list.empty() )
+        break;
+      
+      ret = evaluate(*node->list.rbegin());
       break;
     }
 

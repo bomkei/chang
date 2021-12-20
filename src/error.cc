@@ -9,9 +9,33 @@ void error(ErrorKind kind, Token* token, char const* fmt, ...) {
   vsprintf(buf, fmt, ap);
   va_end(ap);
 
-  std::size_t line = 0;
+  std::size_t line = 1;
   std::size_t column = 0;
-  auto globl = Global::get_instance();
+  std::size_t line_begin, line_end;
+  auto const& src = Global::get_instance()->source;
 
-  printf("%s:%lu:%lu " COL_RED "error: " COL_DEFAULT "%s\n", globl->file_path.c_str(), line, column, buf);
+  for( std::size_t i = 0; i < token->pos; i += 1 ) {
+    if( src[i] == '\n' ) {
+      line_begin = i + 1;
+      line += 1;
+    }
+  }
+
+  for( std::size_t i = token->pos; i < src.length(); i += 1 ) {
+    if( src[i] == '\n' ) {
+      line_end = i;
+      break;
+    }
+  }
+
+  printf(COL_WHITE "%s:%lu:%lu: %s: " COL_DEFAULT "%s\n",
+    Global::get_instance()->file_path.c_str(), line, column,
+      kind == ERR_WARN ? COL_MAGENTA "warning" : (kind == ERR_NOTE ? COL_SKYBLUE "note" : COL_RED "error"), buf);
+
+  printf("%6lu | %s\n",
+    line, src.substr(line_begin, line_end - line_begin).c_str());
+
+  printf("       | %s^%s\n\n",
+    std::string(token->pos - line_begin, ' ').c_str(),
+    std::string(token->str.length() ? token->str.length() - 1 : 0, '~').c_str());
 }

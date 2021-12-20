@@ -195,10 +195,10 @@ private:
   void expect(char const*, bool = true);
   void expect_ident();
 
-  bool is_need_semicolon(Node* node);
-
   Token* token;
   Token* consumed;
+
+  std::vector<Node*> structs;
 };
 
 class Evaluater {
@@ -206,7 +206,7 @@ public:
   ObjectType evaluate(Node* node);
 
 private:
-  std::vector<Node*> evaluated_structs;
+  //std::vector<Node*> evaluated_structs;
 };
 
 class Interpreter {
@@ -222,7 +222,10 @@ enum ErrorKind {
   ERR_PARSE,
   ERR_SYNTAX,
   ERR_EXPECTED,
-  ERR_TYPE
+  ERR_UNEXPECTED,
+  ERR_TYPE,
+  ERR_WARN,
+  ERR_NOTE
 };
 
 struct Global {
