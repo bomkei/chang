@@ -8,9 +8,13 @@ Node* Parser::primary() {
 
     node->token = consumed;
 
-    while( check() && !(closed = consume("}")) ) {
-      node->list.emplace_back(semicolon(expr()));
+    if( consume("}") ) {
+      return node;
     }
+
+    do {
+      
+    } while( );
 
     if( !closed ) {
       error(ERR_SYNTAX, node->token, "not closed");
@@ -70,6 +74,10 @@ Node* Parser::top() {
 
     expect_ident();
     node->name = token->str;
+
+    if( node->name == "main" ) {
+      Global::get_instance()->entry_point = node;
+    }
 
     next();
     expect("(");

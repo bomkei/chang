@@ -141,6 +141,7 @@ struct Node {
   Node* code;
 
   bool evaluated = false;
+  ObjectType objtype;
 
   Node(NodeKind kind)
     : kind(kind) {
@@ -194,12 +195,10 @@ private:
   void expect(char const*, bool = true);
   void expect_ident();
 
-  Node* semicolon(Node* node);
+  bool is_need_semicolon(Node* node);
 
   Token* token;
   Token* consumed;
-
-  std::vector<Node*> parsed_types;
 };
 
 class Evaluater {
@@ -207,7 +206,7 @@ public:
   ObjectType evaluate(Node* node);
 
 private:
-
+  std::vector<Node*> evaluated_structs;
 };
 
 class Interpreter {
@@ -229,11 +228,11 @@ enum ErrorKind {
 struct Global {
   std::string source;
   std::string file_path;
+  Node* entry_point = nullptr;
 
   Global();
 
   static Global* get_instance();
 };
-
 
 void error(ErrorKind kind, Token* token, char const* fmt, ...);

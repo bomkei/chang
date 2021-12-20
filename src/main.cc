@@ -11,7 +11,9 @@ inline void view_token(Token* tok) {
 
 int main(int argc, char** argv) {
   Global global;
-  std::ifstream ifs("test.txt");
+  global.file_path = "test.txt";
+
+  std::ifstream ifs(global.file_path);
   
   for( std::string line; std::getline(ifs, line); ) {
     global.source += line + '\n';
@@ -21,17 +23,22 @@ int main(int argc, char** argv) {
 
   auto tok = lexer.lex();
 
-  view_token(tok);
+  //view_token(tok);
 
   Parser parser(tok);
 
   auto node = parser.parse();
 
+  if( !global.entry_point ) {
+    std::cout << "chang: doesn't exists function with named 'main'." << std::endl;
+    exit(1);
+  }
+
   Evaluater eval;
   eval.evaluate(node);
 
   Interpreter runner;
-  std::cout << runner.run_node(node) << std::endl;
+  std::cout << runner.run_node(global.entry_point) << std::endl;
 
 
 }

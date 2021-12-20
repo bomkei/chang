@@ -8,6 +8,16 @@ Object Interpreter::run_node(Node* node) {
     case NODE_VALUE:
       return node->obj;
 
+    case NODE_SCOPE: {
+      Object obj;
+
+      for( auto&& item : node->list ) {
+        obj = run_node(item);
+      }
+
+      return obj;
+    }
+
     default: {
       auto lhs = run_node(node->lhs);
       auto rhs = run_node(node->rhs);

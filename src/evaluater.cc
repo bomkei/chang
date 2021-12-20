@@ -4,16 +4,46 @@ ObjectType Evaluater::evaluate(Node* node) {
   if( !node )
     return { };
 
+  if( node->evaluated )
+    return node->objtype;
+
+  auto& ret = node->objtype;
+  node->evaluated = true;
+
   switch( node->kind ) {
     case NODE_VALUE:
-      return node->obj.type;
+      ret = node->obj.type;
+      break;
     
-    case NODE_FUNCTION: {
+    case NODE_TYPE: {
+      if( node->name == "int" )
+        ret = OBJ_INT;
+      else if( node->name == "none" )
+        ret = OBJ_NONE;
+      else {
+        error(ERR_TYPE, node->token, "unknown type name");
+        exit(1);
+      }
 
+      break;
+    }
+
+    case NODE_ARGUMENT: {
+      ret = evaluate(node->type);
+      break;
+    }
+
+    case NODE_FUNCTION: {
+      ret = evaluate(node->code);
+      break;
     }
 
     case NODE_SCOPE: {
-      
+      for( auto&& item : node->list ) {
+        ret = evaluate(item);
+      }
+
+      break;
     }
 
     default: {
@@ -25,9 +55,10 @@ ObjectType Evaluater::evaluate(Node* node) {
         exit(1);
       }
 
-      return lhs;
+      ret = lhs;
+      break;
     }
   }
   
-  return { };
+  return ret;
 }
