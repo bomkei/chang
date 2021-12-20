@@ -9,13 +9,13 @@
 #define  __DEBUG__  1
 
 #if __DEBUG__
-  #define alart fprintf(stderr,"\t#alart at %s:%d\n",__FILE__,__LINE__)
+  #define alert fprintf(stderr,"\t#alert at %s:%d\n",__FILE__,__LINE__)
   #define debug(...) __VA_ARGS__
   #define dbgprint(...) {fprintf(stderr,__VA_ARGS__);fflush(stderr);}
   #define loop(n,...)  for(int i=0;i<n;i++){__VA_ARGS__}
   #define print_line(...) {fprintf(stderr,"\n------------------\n%s\tline %6d| %s\n\n",__FILE__,__LINE__,#__VA_ARGS__); __VA_ARGS__ }
 #else
-  #define alart 0
+  #define alert 0
   #define debug(...) 0;
   #define dbgprint(...) 0
   #define loop(...) 0

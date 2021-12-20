@@ -6,12 +6,14 @@ Object Interpreter::run_node(Node* node) {
   
   switch( node->kind ) {
     case NODE_VALUE:
+      alert;
       return node->obj;
 
     case NODE_SCOPE: {
       Object obj;
 
       for( auto&& item : node->list ) {
+        alert;
         obj = run_node(item);
       }
 

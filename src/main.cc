@@ -21,12 +21,14 @@ int main(int argc, char** argv) {
 
   Lexer lexer(global.source);
 
+  alert;
   auto tok = lexer.lex();
 
   //view_token(tok);
 
   Parser parser(tok);
 
+  alert;
   auto node = parser.parse();
 
   if( !global.entry_point ) {
@@ -35,10 +37,12 @@ int main(int argc, char** argv) {
   }
 
   Evaluater eval;
+  alert;
   eval.evaluate(node);
 
   Interpreter runner;
-  std::cout << runner.run_node(global.entry_point) << std::endl;
+  alert;
+  std::cout << runner.run_node(global.entry_point->code) << std::endl;
 
 
 }
