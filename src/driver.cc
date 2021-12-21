@@ -46,4 +46,5 @@ int Driver::main(int argc, char** argv) {
   alert;
   std::cout << runner.run_node(global.entry_point->expr) << std::endl;
 
+  return 0;
 }

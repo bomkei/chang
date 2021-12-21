@@ -15,10 +15,12 @@ Node* Parser::primary() {
       node->list.emplace_back(expr());
 
       if( consume(";") ) {
-        if( token->str == "}" ) {
-          error(ERR_UNEXPECTED, token, "unexpected character '}'");
-          error(ERR_NOTE, consumed, "semicolon is not needed at last of scope. maybe did you forget remove it?");
-          exit(1);
+        if( consume("}") ) {
+          // error(ERR_UNEXPECTED, token, "unexpected character '}'");
+          // error(ERR_NOTE, consumed, "semicolon is not needed at last of scope. maybe did you forget remove it?");
+          // exit(1);
+          node->list.emplace_back(nullptr);
+          break;
         }
 
         continue;
