@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#define  __DEBUG__  1
+#define  __DEBUG__  0
 
 #if __DEBUG__
   #define alert fprintf(stderr,"\t#alert at %s:%d\n",__FILE__,__LINE__)
@@ -231,6 +231,11 @@ private:
 class Interpreter {
 public:
   Object run_node(Node* node);
+
+  static void add(Object& obj, Object& val);
+  static void sub(Object& obj, Object& val);
+  static void mul(Object& obj, Object& val);
+  static void div(Object& obj, Object& val);
 
 private:
 

@@ -102,7 +102,20 @@ Node* Parser::add() {
 
 Node* Parser::expr() {
   if( consume("var") ) {
+    auto node = new Node(NODE_VAR);
 
+    expect_ident();
+    node->name = token->str;
+
+    if( consume(":") ) {
+      node->type = expect_type();
+    }
+
+    if( consume("=") ) {
+      node->expr = expr();
+    }
+
+    return node;
   }
 
   return add();
@@ -122,12 +135,19 @@ Node* Parser::top() {
     next();
     expect("(");
 
-    // todo: read args
-    expect(")");
+    if( !consume(")") ) {
+      do {
+        node->list.emplace_back(expect_argument());
+      } while( consume(",") );
+      expect(")");
+    }
+
+    if( consume("->") ) {
+      node->type = expect_type();
+    }
 
     expect("{", false);
     node->expr = expr();
-    
 
     return node;
   }

@@ -33,7 +33,20 @@ Object Interpreter::run_node(Node* node) {
 
         switch( pair.kind ) {
           case EXPR_ADD:
-            
+            Interpreter::add(obj, item);
+            break;
+
+          case EXPR_SUB:
+            Interpreter::sub(obj, item);
+            break;
+
+          case EXPR_MUL:
+            Interpreter::mul(obj, item);
+            break;
+
+          case EXPR_DIV:
+            Interpreter::div(obj, item);
+            break;
         }
       }
 
