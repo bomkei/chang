@@ -257,9 +257,11 @@ struct Global {
   std::string file_path;
   Node* entry_point = nullptr;
 
-  Global();
-
   static Global* get_instance();
+
+private:
+  Global();
+  friend class Driver;
 };
 
 class Driver {
@@ -272,7 +274,7 @@ public:
   int main(int argc, char** argv);
 
 private:
-
+  Global global;
 };
 
 void error(ErrorKind kind, Token* token, char const* fmt, ...);
