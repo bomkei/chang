@@ -127,6 +127,12 @@ enum NodeKind {
   NODE_ARGUMENT,
 
   NODE_VALUE,
+  NODE_VARIABLE,
+
+  // Call Func
+  //  name = function name
+  //  list = arguments
+  NODE_CALLFUNC
 };
 
 enum ExprKind {

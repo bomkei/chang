@@ -34,7 +34,7 @@ int Driver::main(int argc, char** argv) {
   auto node = parser.parse();
 
   if( !global.entry_point ) {
-    std::cout << "chang: doesn't exists function with named 'main'." << std::endl;
+    std::cout << "entry point function 'main' is not defined." << std::endl;
     exit(1);
   }
 

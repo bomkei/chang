@@ -16,9 +16,6 @@ Node* Parser::primary() {
 
       if( consume(";") ) {
         if( consume("}") ) {
-          // error(ERR_UNEXPECTED, token, "unexpected character '}'");
-          // error(ERR_NOTE, consumed, "semicolon is not needed at last of scope. maybe did you forget remove it?");
-          // exit(1);
           node->list.emplace_back(nullptr);
           break;
         }
@@ -43,6 +40,12 @@ Node* Parser::primary() {
 
       next();
       return node;
+    }
+
+    case TOK_IDENT: {
+      auto node = new Node(NODE_VARIABLE);
+
+      
     }
   }
 
