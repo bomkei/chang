@@ -45,7 +45,11 @@ Node* Parser::primary() {
     case TOK_IDENT: {
       auto node = new Node(NODE_VARIABLE);
 
-      
+      node->token = token;
+      node->name = token->str;
+
+      next();
+      return node;
     }
   }
 
@@ -108,6 +112,7 @@ Node* Parser::add() {
 Node* Parser::expr() {
   if( consume("var") ) {
     auto node = new Node(NODE_VAR);
+    node->token = consumed;
 
     expect_ident();
     node->name = token->str;
@@ -120,6 +125,10 @@ Node* Parser::expr() {
       node->expr = expr();
     }
 
+    if( !node->type && !node->expr ) {
+      error(ERR_TYPE, node->token, "cannot infer a type of variable");
+    }
+    
     return node;
   }
 

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <list>
+#include <map>
 
 #define  __DEBUG__  0
 
@@ -92,6 +94,7 @@ struct ObjectType {
 
 struct Object {
   ObjectType type;
+  std::string_view name;
 
   long v_int;
 
@@ -164,19 +167,19 @@ struct Node {
   bool evaluated = false;
   ObjectType objtype;
 
+  // variable
+  Node* var_scope;
+  long var_index = -1;
+
   // if self is NODE_VAR, this is can use to check if placed self on allowed area.
   // example for, root in scope.
   bool is_allowed_let = false;
 
-  Node(NodeKind kind)
-    : kind(kind) {
 
-  }
+  long find_var(std::string_view const& name);
 
-  Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok = nullptr)
-    : kind(kind), lhs(lhs), rhs(rhs), token(tok) {
-
-  }
+  Node(NodeKind kind);
+  Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok = nullptr);
 };
 
 class Lexer {
@@ -231,7 +234,9 @@ public:
   ObjectType evaluate(Node* node);
 
 private:
-  //std::vector<Node*> evaluated_structs;
+  std::tuple<Node*, std::size_t> find_var(std::string_view const& name);
+
+  std::list<Node*> scope_list;
 };
 
 class Interpreter {
@@ -253,6 +258,7 @@ enum ErrorKind {
   ERR_SYNTAX,
   ERR_EXPECTED,
   ERR_UNEXPECTED,
+  ERR_UNDEFINED,
   ERR_TYPE,
   ERR_WARN,
   ERR_NOTE
