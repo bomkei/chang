@@ -1,5 +1,20 @@
 #include "chang.h"
 
+Object& Interpreter::run_lvalue(Node* node) {
+#if __DEBUG__
+  assert(node != nullptr);
+#endif
+
+  switch( node->kind ) {
+    case NODE_VARIABLE: {
+      return node->var_scope->objects[node->var_index];
+    }
+  }
+
+  alert;
+  abort();
+}
+
 Object Interpreter::run_node(Node* node) {
   if( !node )
     return { };
@@ -8,6 +23,9 @@ Object Interpreter::run_node(Node* node) {
     case NODE_VALUE:
       alert;
       return node->obj;
+    
+    case NODE_VARIABLE:
+      return run_lvalue(node);
 
     case NODE_SCOPE: {
       Object obj;
@@ -18,11 +36,6 @@ Object Interpreter::run_node(Node* node) {
       }
 
       return obj;
-    }
-
-    case NODE_VAR: {
-
-      break;
     }
 
     case NODE_EXPR: {

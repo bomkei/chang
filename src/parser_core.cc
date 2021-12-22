@@ -111,11 +111,15 @@ Node* Parser::add() {
 
 Node* Parser::expr() {
   if( consume("var") ) {
+    alert;
+    
     auto node = new Node(NODE_VAR);
     node->token = consumed;
 
     expect_ident();
     node->name = token->str;
+
+    next();
 
     if( consume(":") ) {
       node->type = expect_type();

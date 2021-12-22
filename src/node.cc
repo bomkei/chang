@@ -14,7 +14,7 @@ Node::Node(NodeKind kind)
 
 }
 
-Node::Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok = nullptr)
+Node::Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok)
   : kind(kind), lhs(lhs), rhs(rhs), token(tok) {
 
 }

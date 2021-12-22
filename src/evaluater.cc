@@ -1,7 +1,11 @@
 #include "chang.h"
 
 std::tuple<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
-  for( auto it = scope_list.rbegin(); it != scope_list.rend(); it++ ) {
+  for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
+    alert;
+    fprintf(stderr,"*it = %p\n",*it);
+    fprintf(stderr,"(*it)->object.size() = %lu\n",(*it)->objects.size());
+
     auto find = (*it)->find_var(name);
 
     if( find != -1 ) {
@@ -22,10 +26,6 @@ ObjectType Evaluater::evaluate(Node* node) {
   auto& ret = node->objtype;
   node->evaluated = true;
 
-#if __DEBUG__
-  assert(!scope_list.empty());
-#endif
-
   switch( node->kind ) {
     case NODE_VALUE:
       ret = node->obj.type;
@@ -34,10 +34,15 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_VARIABLE: {
       auto [scope, index] = find_var(node->name);
 
+      alert;
+      fprintf("scope = %p\n");
+      fprintf("index = %lu\n");
+
       if( scope ) {
         node->var_scope = scope;
         node->var_index = index;
-        return scope->objects[index].type;
+        ret = scope->objects[index].type;
+        break;
       }
 
       error(ERR_UNDEFINED, node->token, "undefined variable name '%s'", node->name.cbegin());
@@ -68,29 +73,62 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_SCOPE: {
-      if( node->list.empty() )
+      alert;
+      fprintf(stderr,"scope=%p\n",node);
+
+      if( node->list.empty() ) {
+        alert;
         break;
+      }
+      
+      scope_list.push_front(node);
       
       ret = evaluate(*node->list.rbegin());
+
+      scope_list.pop_front();
       break;
     }
 
     case NODE_VAR: {
+      alert;
+
       auto [scope, index] = find_var(node->name);
 
-      
-    }
-
-    default: {
-      auto lhs = evaluate(node->lhs);
-      auto rhs = evaluate(node->rhs);
-
-      if( !lhs.equals(rhs) ) {
-        error(ERR_TYPE, node->token, "type mismatch");
+      if( scope ) {
+        error(ERR_MULTIPLE_DEFINED, node->token, "multiple defined variable name");
         exit(1);
       }
 
-      ret = lhs;
+      auto cur = *scope_list.begin();
+      auto& obj = cur->objects.emplace_back();
+
+      obj.name = node->name;
+
+      if( node->type ) {
+        obj.type = evaluate(node->type);
+      }
+
+      if( node->expr ) {
+        auto expr_t = evaluate(node->expr);
+
+        if( node->type && !expr_t.equals(obj.type) ) {
+          error(ERR_TYPE, node->token, "type mismatch");
+        }
+      }
+
+      alert;
+      std::cout << obj << std::endl;
+
+      break;
+    }
+
+    case NODE_EXPR: {
+      ret = evaluate(node->expr);
+
+      for( auto&& item : node->expr_list ) {
+        evaluate(item.item);
+      }
+
       break;
     }
   }

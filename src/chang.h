@@ -1,14 +1,16 @@
 #pragma
 
 #include <concepts>
+#include <cassert>
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
 
-#define  __DEBUG__  0
+#define  __DEBUG__  1
 
 #if __DEBUG__
   #define alert fprintf(stderr,"\t#alert at %s:%d\n",__FILE__,__LINE__)
@@ -242,6 +244,7 @@ private:
 class Interpreter {
 public:
   Object run_node(Node* node);
+  Object& run_lvalue(Node* node);
 
   static void add(Object& obj, Object& val);
   static void sub(Object& obj, Object& val);
@@ -259,6 +262,7 @@ enum ErrorKind {
   ERR_EXPECTED,
   ERR_UNEXPECTED,
   ERR_UNDEFINED,
+  ERR_MULTIPLE_DEFINED,
   ERR_TYPE,
   ERR_WARN,
   ERR_NOTE
