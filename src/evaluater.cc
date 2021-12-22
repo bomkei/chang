@@ -1,23 +1,5 @@
 #include "chang.h"
 
-std::tuple<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
-  for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
-#if __DEBUG__
-    alert;
-    fprintf(stderr,"*it = %p\n",*it);
-    fprintf(stderr,"(*it)->object.size() = %lu\n",(*it)->objects.size());
-#endif
-
-    auto find = (*it)->find_var(name);
-
-    if( find != -1 ) {
-      return { *it, find };
-    }
-  }
-  
-  return { nullptr, 0 };
-}
-
 ObjectType Evaluater::evaluate(Node* node) {
   if( !node )
     return { };
@@ -90,6 +72,7 @@ ObjectType Evaluater::evaluate(Node* node) {
       scope_list.push_front(node);
       
       for( auto&& i : node->list ) {
+        i->is_allowed_let = true;
         ret = evaluate(i);
       }
 
@@ -98,6 +81,11 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_VAR: {
+      if( !node->is_allowed_let ) {
+        error(ERR_LOCATION, node->token, "cannot declare variable here");
+        exit(1);
+      }
+
       auto [scope, index] = find_var(node->name);
 
       if( scope ) {
@@ -126,6 +114,16 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       break;
+    }
+
+    case NODE_IF: {
+      evaluate(node->expr);
+
+      if( node->if_else ) {
+        if( !evaluate(node->if_true).equals(evaluate(node->if_else)) ) {
+          error(ERR_TYPE, node->token, "type mismatch of "
+        }
+      }
     }
 
     case NODE_EXPR: {

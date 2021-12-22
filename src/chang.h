@@ -119,6 +119,9 @@ enum NodeKind {
   //  expr = initializer expr
   NODE_VAR,
 
+  // If statement
+  NODE_IF,
+
   // Scope
   //  list = elements
   NODE_SCOPE,
@@ -172,6 +175,9 @@ struct Node {
   std::string_view name;
   Node* type;
   Node* expr;
+
+  Node* if_true;
+  Node* if_else;
 
   bool evaluated = false;
   ObjectType objtype;
@@ -243,6 +249,12 @@ public:
   ObjectType evaluate(Node* node);
 
 private:
+  std::vector<Node*> get_return_values(Node* node);
+
+  // // check if all nodes which can be return value be integrated as same types.
+  // argument is must be NODE_SCOPE
+  Node* check_integrated(Node* node);
+
   std::tuple<Node*, std::size_t> find_var(std::string_view const& name);
 
   std::list<Node*> scope_list;
@@ -270,6 +282,7 @@ enum ErrorKind {
   ERR_UNEXPECTED,
   ERR_UNDEFINED,
   ERR_MULTIPLE_DEFINED,
+  ERR_LOCATION,
   ERR_TYPE,
   ERR_WARN,
   ERR_NOTE

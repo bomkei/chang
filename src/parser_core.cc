@@ -2,6 +2,26 @@
 
 Node* Parser::primary() {
   
+  if( consume("if") ) {
+    auto node = new Node(NODE_IF);
+    node->token = consumed;
+
+    node->expr = expr();
+
+    expect("{", false);
+    node->if_true = expr();
+
+    if( consume("else") ) {
+      expect("{", false);
+      node->if_else = expr();
+    }
+    else {
+      node->if_else = nullptr;
+    }
+
+    return node;
+  }
+
   if( consume("{") ) {
     auto node = new Node(NODE_SCOPE);
 
