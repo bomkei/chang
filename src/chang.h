@@ -249,12 +249,18 @@ public:
   ObjectType evaluate(Node* node);
 
 private:
-  bool check_branchable(Node* node);
+  bool is_branchable(Node* node);
+
+  //  get all nodes which can be return value
   std::vector<Node*> get_return_values(Node* node);
 
-  // // check if all nodes which can be return value be integrated as same types.
-  // argument is must be NODE_SCOPE
-  Node* check_integrated(Node* node);
+  // check if all nodes which can be return value be integrated as same types.
+  // argument is must NODE_SCOPE
+  //
+  // return:
+  //   [true, nullptr]  = integrated
+  //   [false, <node>]  = not integrated
+  std::pair<bool, Node*> is_integrated(Node* node);
 
   std::tuple<Node*, std::size_t> find_var(std::string_view const& name);
 

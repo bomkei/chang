@@ -1,36 +1,60 @@
 #include "chang.h"
 
-bool Evaluater::check_branchable(Node* node) {
+bool Evaluater::is_branchable(Node* node) {
   if( !node )
     return false;
 
-  switch( node
+  switch( node->kind ) {
+    case NODE_IF:
+      return true;
+  }
+
+  return false;
 }
 
 std::vector<Node*> Evaluater::get_return_values(Node* node) {
+  using Vec = std::vector<Node*>;
+
   if( !node )
     return { };
 
   switch( node->kind ) {
-    case NODE_VALUE:
-    case NODE_VARIABLE:
-    case NODE_CALLFUNC:
-      return { node };
-    
     case NODE_IF: {
-      
+      Vec v;
+
+      for( auto&& i : get_return_values(node->if_true) ) {
+        v.emplace_back(i);
+      }
+
+      for( auto&& i : get_return_values(node->if_else) ) {
+        v.emplace_back(i);
+      }
+
+      return v;
     }
 
     case NODE_SCOPE: {
+      Vec v;
 
+      for( auto it = node->list.rbegin(); it != node->list.rend(); it++ ) {
+        for( auto&& i : get_return_values(*it) ) {
+          v.emplace_back(i);
+        }
+
+        if( !is_branchable(i) ) {
+          break;
+        }
+      }
+
+      return v;
     }
   }
 
-  return { };
+  return { node };
 }
 
-Node* Evaluater::check_integrated(Node* node) {
-
+std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
+  
 }
 
 std::tuple<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
