@@ -1,5 +1,14 @@
 #include "chang.h"
 
+inline void view_token(Token* tok) {
+  while( tok->kind != TOK_EOF ) {
+    std::cout << tok->str << " ";
+    tok = tok->next;
+  }
+
+  std::cout << std::endl;
+}
+
 Driver::Driver() {
 
 }
@@ -25,8 +34,6 @@ int Driver::main(int argc, char** argv) {
 
   alert;
   auto tok = lexer.lex();
-
-  //view_token(tok);
 
   Parser parser(tok);
 
