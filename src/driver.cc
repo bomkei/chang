@@ -50,8 +50,9 @@ int Driver::main(int argc, char** argv) {
   eval.evaluate(node);
 
   Interpreter runner;
+  
   alert;
-  std::cout << runner.run_node(global.entry_point->expr) << std::endl;
+  runner.run_node(global.entry_point->expr);
 
   return 0;
 }

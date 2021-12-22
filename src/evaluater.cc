@@ -39,6 +39,12 @@ ObjectType Evaluater::evaluate(Node* node) {
       error(ERR_UNDEFINED, node->token, "undefined variable name '%s'", Utils::str(node->name));
       exit(1);
     }
+    
+    case NODE_CALLFUNC: {
+
+
+      break;
+    }
 
     case NODE_TYPE: {
       if( node->name == "int" )

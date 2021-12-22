@@ -23,9 +23,14 @@ Object Interpreter::run_node(Node* node) {
     case NODE_VALUE:
       alert;
       return node->obj;
-    
+
     case NODE_VARIABLE:
       return run_lvalue(node);
+
+    case NODE_CALLFUNC: {
+
+      break;
+    }
 
     case NODE_SCOPE: {
       Object obj;

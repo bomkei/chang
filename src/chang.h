@@ -294,26 +294,19 @@ private:
 
 };
 
-class BuiltinFunc {
-public:
-  using FuncPointer = Object(*)(std::vector<Object>);
+struct BuiltinFunc {
+  using FuncPointer = Object(*)(std::vector<Object>&);
 
-  struct Data {
-    char const* name;
-    std::vector<ObjectType> arg_types;
-    ObjectType ret_type;
-    FuncPointer func;
+  char const* name;
+  bool arg_free;
+  std::vector<ObjectType> arg_types;
+  ObjectType ret_type;
+  FuncPointer func;
 
-  private:
-    Data();
-    ~Data() = delete;
-  };
-
-  std::vector<Data> const& get();
+  static std::vector<BuiltinFunc> const& get_list();
 
 private:
-  BuiltinFunc();
-  ~BuiltinFunc() = delete;
+  BuiltinFunc(char const*, bool, std::vector<ObjectType>, ObjectType, FuncPointer);
 };
 
 enum ErrorKind {
