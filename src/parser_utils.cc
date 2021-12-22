@@ -26,3 +26,12 @@ Node* Parser::expect_type() {
 
   return node;
 }
+
+bool Parser::is_need_semicolon(Node* node) {
+  switch( node->kind ) {
+    case NODE_VAR:
+      return true;
+  }
+
+  return false;
+}

@@ -114,40 +114,45 @@ enum NodeKind {
   NODE_EXPR,
   NODE_ASSIGN,
 
-  // Variable Declaration
-  //  name = variable name
-  //  expr = initializer expr
-  NODE_VAR,
-
-  // If statement
-  NODE_IF,
-
-  // Scope
-  //  list = elements
-  NODE_SCOPE,
-
-  // Type
-  //  name = type name
-  NODE_TYPE,
-
-  // Function
-  //  name = function name
-  //  list = arguments (NODE_ARGUMENT)
-  //  expr = code of function
-  NODE_FUNCTION,
-
-  // Argument
-  //  name = argument name
-  //  type = type
-  NODE_ARGUMENT,
-
   NODE_VALUE,
   NODE_VARIABLE,
 
-  // Call Func
-  //  name = function name
-  //  list = arguments
+  // argument
+  //   name = argument name
+  //   type = type
+  NODE_ARGUMENT,
+
+  // type
+  //   name = type name
+  NODE_TYPE,
+
+  // call Func
+  //   name = function name
+  //   list = arguments
   NODE_CALLFUNC
+
+  // variable Declaration
+  //   name = variable name
+  //   expr = initializer expr
+  NODE_VAR,
+
+  // if statement
+  NODE_IF,
+
+  // scope
+  //   list = elements
+  NODE_SCOPE,
+
+  // function
+  //   name = function name
+  //   list = arguments (NODE_ARGUMENT)
+  //   expr = code of function
+  NODE_FUNCTION,
+
+  // enum
+  //   name       = name
+  //   enum_list  = elements
+  NODE_ENUM,
 };
 
 enum ExprKind {
@@ -163,6 +168,11 @@ struct Node {
     Node* item;
   };
 
+  struct Enum {
+    std::string_view name;
+    Node* value_type;
+  };
+
   NodeKind kind;
   Token* token;
   Node* lhs;
@@ -171,6 +181,7 @@ struct Node {
   std::vector<Node*> list;
   std::vector<Object> objects;
   std::vector<ExprPair> expr_list;
+  std::vector<Enum> enum_list;
 
   std::string_view name;
   Node* type;
@@ -222,9 +233,6 @@ public:
 
   Node* parse();
 
-  Node* expect_argument();
-  Node* expect_type();
-
   Node* primary();
   Node* mul();
   Node* add();
@@ -237,6 +245,11 @@ private:
   bool consume(char const*);
   void expect(char const*, bool = true);
   void expect_ident();
+
+  Node* expect_argument();
+  Node* expect_type();
+
+  bool is_need_semicolon(Node* node);
 
   Token* token;
   Token* consumed;

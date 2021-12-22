@@ -32,19 +32,13 @@ Node* Parser::primary() {
     }
 
     while( check() ) {
-      node->list.emplace_back(expr());
+      auto expr = expr();
 
-      if( consume(";") ) {
-        if( consume("}") ) {
-          node->list.emplace_back(nullptr);
-          break;
-        }
-
-        continue;
+      if( is_need_semicolon(expr) ) {
+        expect(";");
       }
-
-      expect("}");
-      break;
+      
+      
     }
 
     return node;
