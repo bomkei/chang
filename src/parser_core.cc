@@ -93,7 +93,7 @@ Node* Parser::primary() {
         do {
           node->list.emplace_back(expr());
         } while( consume(",") );
-        
+
         expect(")");
       }
 
@@ -105,8 +105,26 @@ Node* Parser::primary() {
   exit(1);
 }
 
-Node* Parser::mul() {
+Node* Parser::member() {
   auto node = primary();
+
+  while( consume(".") ) {
+    auto x = primary();
+
+    if( x->kind == NODE_CALLFUNC ) {
+      x->list.insert(x->list.begin(), node);
+      node = x;
+    }
+    else {
+      x = new Node(NODE_MEMBER_ACCESS, node, x, consumed);
+    }
+  }
+
+  return node;
+}
+
+Node* Parser::mul() {
+  auto node = member();
 
   if( token->str == "*" || token->str == "/" ) {
     auto expr = new Node(NODE_EXPR);
@@ -123,7 +141,7 @@ Node* Parser::mul() {
       else
         break;
 
-      expr->expr_list.emplace_back(Node::ExprPair{ kind, primary() });
+      expr->expr_list.emplace_back(Node::ExprPair{ kind, member() });
     }
 
     return expr;

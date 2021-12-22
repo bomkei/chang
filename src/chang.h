@@ -116,6 +116,7 @@ enum NodeKind {
 
   NODE_VALUE,
   NODE_VARIABLE,
+  NODE_MEMBER_ACCESS,
 
   // argument
   //   name = argument name
@@ -205,7 +206,6 @@ struct Node {
   // built-in func
   BuiltinFunc const* builtin = nullptr;
 
-
   long find_var(std::string_view const& name);
 
   Node(NodeKind kind);
@@ -238,6 +238,7 @@ public:
   Node* parse();
 
   Node* primary();
+  Node* member();
   Node* mul();
   Node* add();
   Node* expr();

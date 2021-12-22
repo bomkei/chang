@@ -15,6 +15,14 @@ std::vector<BuiltinFunc> const& BuiltinFunc::get_list() {
           std::cout << i;
         }
 
+        return { };
+      }),
+      BuiltinFunc(
+        "println", true, { }, OBJ_NONE, FUNC {
+        for( auto&& i : args ) {
+          std::cout << i;
+        }
+
         std::cout << std::endl;
         return { };
       }),

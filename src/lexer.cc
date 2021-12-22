@@ -20,9 +20,23 @@ Token* Lexer::lex() {
 
     cur = new Token(TOK_INT, cur, pos);
 
+    // numeric
     if( isdigit(ch) ) {
       cur->str = { str, pass_num() };
+
+      if( peek() == '.' ) {
+        position += 1;
+
+        if( !isdigit(peek()) ) {
+          position -= 1;
+          continue;
+        }
+
+        
+      }
     }
+
+    // identifier
     else if( isalpha(ch) || ch == '_' ) {
       cur->kind = TOK_IDENT;
       cur->str = { str, pass_ident() };
