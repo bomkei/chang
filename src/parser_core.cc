@@ -32,13 +32,26 @@ Node* Parser::primary() {
     }
 
     while( check() ) {
-      auto expr = expr();
+      auto item = expr();
+      node->list.emplace_back(item);
 
-      if( is_need_semicolon(expr) ) {
-        expect(";");
+      if( consume(";") ) {
+        if( consume("}") ) {
+          node->list.emplace_back(nullptr);
+          break;
+        }
+
+        continue;
       }
-      
-      
+
+      expect("}");
+
+      if( is_need_semicolon(item) ) {
+        error(ERR_EXPECTED, consumed, "expected ';' , because previous statement is can't be return value.");
+        error(ERR_NOTE, item->token, "this is return nothing");
+      }
+
+      break;
     }
 
     return node;
@@ -157,6 +170,7 @@ Node* Parser::expr() {
 Node* Parser::top() {
   if( consume("fn") ) {
     auto node = new Node(NODE_FUNCTION);
+    node->token = consumed;
 
     expect_ident();
     node->name = token->str;

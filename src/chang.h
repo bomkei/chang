@@ -129,7 +129,7 @@ enum NodeKind {
   // call Func
   //   name = function name
   //   list = arguments
-  NODE_CALLFUNC
+  NODE_CALLFUNC,
 
   // variable Declaration
   //   name = variable name
@@ -312,6 +312,8 @@ struct Global {
   std::string source;
   std::string file_path;
   Node* entry_point = nullptr;
+
+  bool was_error_occurred = false;
 
   static Global* get_instance();
 

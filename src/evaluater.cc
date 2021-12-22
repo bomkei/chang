@@ -64,6 +64,11 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_SCOPE: {
+      alert;
+      for( auto&& i : get_return_values(node) ) {
+        error(ERR_NOTE, i->token, "");
+      }
+
       if( node->list.empty() ) {
         alert;
         break;
@@ -72,6 +77,10 @@ ObjectType Evaluater::evaluate(Node* node) {
       scope_list.push_front(node);
       
       for( auto&& i : node->list ) {
+        if( !i ) {
+          continue;
+        }
+        
         i->is_allowed_let = true;
         ret = evaluate(i);
       }
@@ -119,11 +128,15 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_IF: {
       evaluate(node->expr);
 
+      ret = evaluate(node->if_true);
+
       if( node->if_else ) {
-        if( !evaluate(node->if_true).equals(evaluate(node->if_else)) ) {
-          error(ERR_TYPE, node->token, "type mismatch of "
+        if( !ret.equals(evaluate(node->if_else)) ) {
+          error(ERR_TYPE, node->token, "type mismatch");
         }
       }
+
+      break;
     }
 
     case NODE_EXPR: {

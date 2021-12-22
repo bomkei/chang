@@ -41,12 +41,16 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
           v.emplace_back(i);
         }
 
-        if( !is_branchable(i) ) {
+        if( !is_branchable(*it) ) {
           break;
         }
       }
 
       return v;
+    }
+
+    case NODE_FUNCTION: {
+      return get_return_values(node->expr);
     }
   }
 
