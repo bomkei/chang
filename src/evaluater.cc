@@ -110,6 +110,9 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       obj.name = node->name;
 
+      node->var_scope = cur;
+      node->var_index = cur->objects.size() - 1;
+
       if( node->type ) {
         obj.type = evaluate(node->type);
       }

@@ -37,6 +37,11 @@ Object Interpreter::run_node(Node* node) {
 
       return obj;
     }
+  
+    case NODE_VAR: {
+      node->var_scope->objects[node->var_index] = run_node(node->expr);
+      break;
+    }
 
     case NODE_EXPR: {
       auto obj = run_node(node->expr);
