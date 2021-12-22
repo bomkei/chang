@@ -1,25 +1,11 @@
 #include "chang.h"
 
 Node* Parser::primary() {
-  
-  if( consume("if") ) {
-    auto node = new Node(NODE_IF);
-    node->token = consumed;
 
-    node->expr = expr();
-
-    expect("{", false);
-    node->if_true = expr();
-
-    if( consume("else") ) {
-      expect("{", false);
-      node->if_else = expr();
-    }
-    else {
-      node->if_else = nullptr;
-    }
-
-    return node;
+  if( consume("(") ) {
+    auto e = expr();
+    expect(")");
+    return e;
   }
 
   if( consume("{") ) {
@@ -52,6 +38,26 @@ Node* Parser::primary() {
       }
 
       break;
+    }
+
+    return node;
+  }
+
+  if( consume("if") ) {
+    auto node = new Node(NODE_IF);
+    node->token = consumed;
+
+    node->expr = expr();
+
+    expect("{", false);
+    node->if_true = expr();
+
+    if( consume("else") ) {
+      expect("{", false);
+      node->if_else = expr();
+    }
+    else {
+      node->if_else = nullptr;
     }
 
     return node;
@@ -90,6 +96,7 @@ Node* Parser::mul() {
   if( token->str == "*" || token->str == "/" ) {
     auto expr = new Node(NODE_EXPR);
     expr->expr = node;
+    expr->token = token;
 
     while( check() ) {
       ExprKind kind;
@@ -116,6 +123,7 @@ Node* Parser::add() {
   if( token->str == "+" || token->str == "-" ) {
     auto expr = new Node(NODE_EXPR);
     expr->expr = node;
+    expr->token = token;
 
     while( check() ) {
       ExprKind kind;

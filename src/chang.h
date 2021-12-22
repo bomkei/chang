@@ -294,6 +294,28 @@ private:
 
 };
 
+class BuiltinFunc {
+public:
+  using FuncPointer = Object(*)(std::vector<Object>);
+
+  struct Data {
+    char const* name;
+    std::vector<ObjectType> arg_types;
+    ObjectType ret_type;
+    FuncPointer func;
+
+  private:
+    Data();
+    ~Data() = delete;
+  };
+
+  std::vector<Data> const& get();
+
+private:
+  BuiltinFunc();
+  ~BuiltinFunc() = delete;
+};
+
 enum ErrorKind {
   ERR_LEX,
   ERR_PARSE,
