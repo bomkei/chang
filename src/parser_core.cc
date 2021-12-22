@@ -133,6 +133,7 @@ Node* Parser::expr() {
       error(ERR_TYPE, node->token, "cannot infer a type of variable");
     }
     
+    alert;
     return node;
   }
 

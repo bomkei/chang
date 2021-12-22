@@ -20,6 +20,8 @@ ObjectType Evaluater::evaluate(Node* node) {
   if( !node )
     return { };
 
+  fprintf(stderr,"node->kind = %d\n",node->kind);
+
   if( node->evaluated )
     return node->objtype;
 
@@ -32,11 +34,12 @@ ObjectType Evaluater::evaluate(Node* node) {
       break;
     
     case NODE_VARIABLE: {
+      alert;
       auto [scope, index] = find_var(node->name);
 
       alert;
-      fprintf("scope = %p\n");
-      fprintf("index = %lu\n");
+      fprintf(stderr,"scope = %p\n",scope);
+      fprintf(stderr,"index = %lu\n",index);
 
       if( scope ) {
         node->var_scope = scope;
@@ -83,7 +86,9 @@ ObjectType Evaluater::evaluate(Node* node) {
       
       scope_list.push_front(node);
       
-      ret = evaluate(*node->list.rbegin());
+      for( auto&& i : node->list ) {
+        ret = evaluate(i);
+      }
 
       scope_list.pop_front();
       break;
