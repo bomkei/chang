@@ -6,6 +6,8 @@ SOURCES		= $(wildcard $(SRCDIR)/*.cc)
 OFILES		= $(patsubst %.cc,$(BUILD)/%.o,$(notdir $(SOURCES)))
 HEADER		= $(SRCDIR)/$(TARGET).h
 
+DEST		= /usr/local/bin
+
 COMMON		= -O2
 CXXFLAGS	= $(COMMON) -std=c++20
 LDFLAGS		= -Wl,--gc-sections
@@ -19,10 +21,15 @@ clean:
 re: clean all
 
 debug:
-	@echo todo
+	@$(MAKE) --no-print-directory CXXFLAGS="-g -O0 -std=c++20"
 
-install:
-	@echo todo
+install: all
+	@echo installing...
+	@install -s $(TARGET) $(DEST)
+
+uninstall:
+	@echo uninstalling...
+	@rm -f $(DEST)/$(TARGET)
 
 $(BUILD)/%.o: $(SRCDIR)/%.cc $(HEADER)
 	@echo $(notdir $<)
