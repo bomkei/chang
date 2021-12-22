@@ -29,6 +29,15 @@ Node* Parser::primary() {
 
         continue;
       }
+      else {
+        switch( item->kind ) {
+          case NODE_IF:
+            if( token->str != "}" ) {
+              continue;
+            }
+            break;
+        }
+      }
 
       expect("}");
 
