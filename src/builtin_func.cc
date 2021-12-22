@@ -23,3 +23,12 @@ std::vector<BuiltinFunc> const& BuiltinFunc::get_list() {
 
   return *list;
 }
+
+BuiltinFunc::BuiltinFunc(char const* name, bool argfree, std::vector<ObjectType> argtypes, ObjectType ret, FuncPointer ptr)
+  : name(name),
+    arg_free(argfree),
+    arg_types(argtypes),
+    ret_type(ret),
+    func(ptr)
+{
+}

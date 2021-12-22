@@ -82,6 +82,21 @@ Node* Parser::primary() {
       node->name = token->str;
 
       next();
+
+      if( consume("(") ) {
+        node->kind = NODE_CALLFUNC;
+
+        if( consume(")") ) {
+          return node;
+        }
+
+        do {
+          node->list.emplace_back(expr());
+        } while( consume(",") );
+        
+        expect(")");
+      }
+
       return node;
     }
   }

@@ -41,7 +41,39 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
     
     case NODE_CALLFUNC: {
+      auto const& builtin = BuiltinFunc::get_list();
 
+      std::size_t argc;
+      bool arg_free;
+
+      for( auto&& i : node->list ) {
+        evaluate(i);
+      }
+
+      for( auto&& i : builtin ) {
+        if( i.name == node->name ) {
+          argc = i.arg_types.size();
+          arg_free = i.arg_free;
+          node->builtin = &i;
+          ret = i.ret_type;
+          goto check_process;
+        }
+      }
+
+      throw 0;
+
+      // todo: user defined
+
+    check_process:;
+
+      if( !arg_free ) {
+        if( node->list.size() < argc ) {
+          error(ERR_ARGUMENT, node->token, "too few argument");
+        }
+        else if( node->list.size() > argc ) {
+          error(ERR_ARGUMENT, node->token, "too many argument");
+        }
+      }
 
       break;
     }

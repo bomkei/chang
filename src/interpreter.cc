@@ -28,6 +28,15 @@ Object Interpreter::run_node(Node* node) {
       return run_lvalue(node);
 
     case NODE_CALLFUNC: {
+      std::vector<Object> args;
+
+      for( auto&& i : node->list ) {
+        args.emplace_back(run_node(i));
+      }
+
+      if( node->builtin ) {
+        return node->builtin->func(args);
+      }
 
       break;
     }

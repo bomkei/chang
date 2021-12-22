@@ -162,6 +162,7 @@ enum ExprKind {
   EXPR_DIV,
 };
 
+struct BuiltinFunc;
 struct Node {
   struct ExprPair {
     ExprKind kind;
@@ -200,6 +201,9 @@ struct Node {
   // if self is NODE_VAR, this is can use to check if placed self on allowed area.
   // example for, root in scope.
   bool is_allowed_let = false;
+
+  // built-in func
+  BuiltinFunc const* builtin = nullptr;
 
 
   long find_var(std::string_view const& name);
@@ -318,6 +322,7 @@ enum ErrorKind {
   ERR_UNDEFINED,
   ERR_MULTIPLE_DEFINED,
   ERR_LOCATION,
+  ERR_ARGUMENT,
   ERR_TYPE,
   ERR_WARN,
   ERR_NOTE
