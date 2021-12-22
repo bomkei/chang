@@ -44,6 +44,7 @@ namespace Utils {
   inline auto str(std::string_view const& str) {
     static char buf[0x1000];
     memcpy(buf, str.cbegin(), str.length());
+    buf[str.length()] = 0;
     return buf;
   }
 }

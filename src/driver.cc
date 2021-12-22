@@ -9,7 +9,7 @@ Driver::~Driver() {
 }
 
 bool Driver::parse_arguments(int argc, char** argv) {
-
+  return true;
 }
 
 int Driver::main(int argc, char** argv) {

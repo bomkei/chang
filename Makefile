@@ -7,7 +7,7 @@ OFILES		= $(patsubst %.cc,$(BUILD)/%.o,$(notdir $(SOURCES)))
 HEADER		= $(SRCDIR)/$(TARGET).h
 
 COMMON		= -O2
-CXXFLAGS	= $(COMMON) -std=c++20
+CXXFLAGS	= $(COMMON) -std=c++20 -Wno-switch
 LDFLAGS		= -Wl,--gc-sections
 
 all: $(TARGET)
