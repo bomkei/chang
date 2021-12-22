@@ -249,6 +249,7 @@ public:
   ObjectType evaluate(Node* node);
 
 private:
+  bool check_branchable(Node* node);
   std::vector<Node*> get_return_values(Node* node);
 
   // // check if all nodes which can be return value be integrated as same types.
