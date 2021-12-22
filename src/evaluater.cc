@@ -2,9 +2,11 @@
 
 std::tuple<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
   for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
+#if __DEBUG__
     alert;
     fprintf(stderr,"*it = %p\n",*it);
     fprintf(stderr,"(*it)->object.size() = %lu\n",(*it)->objects.size());
+#endif
 
     auto find = (*it)->find_var(name);
 
@@ -20,7 +22,9 @@ ObjectType Evaluater::evaluate(Node* node) {
   if( !node )
     return { };
 
+#if __DEBUG__
   fprintf(stderr,"node->kind = %d\n",node->kind);
+#endif
 
   if( node->evaluated )
     return node->objtype;
@@ -37,9 +41,11 @@ ObjectType Evaluater::evaluate(Node* node) {
       alert;
       auto [scope, index] = find_var(node->name);
 
+#if __DEBUG__
       alert;
       fprintf(stderr,"scope = %p\n",scope);
       fprintf(stderr,"index = %lu\n",index);
+#endif
 
       if( scope ) {
         node->var_scope = scope;
@@ -48,7 +54,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         break;
       }
 
-      error(ERR_UNDEFINED, node->token, "undefined variable name '%s'", node->name.cbegin());
+      error(ERR_UNDEFINED, node->token, "undefined variable name '%s'", Utils::str(node->name));
       exit(1);
     }
 
@@ -76,9 +82,6 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_SCOPE: {
-      alert;
-      fprintf(stderr,"scope=%p\n",node);
-
       if( node->list.empty() ) {
         alert;
         break;
@@ -95,8 +98,6 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_VAR: {
-      alert;
-
       auto [scope, index] = find_var(node->name);
 
       if( scope ) {
@@ -120,9 +121,6 @@ ObjectType Evaluater::evaluate(Node* node) {
           error(ERR_TYPE, node->token, "type mismatch");
         }
       }
-
-      alert;
-      std::cout << obj << std::endl;
 
       break;
     }

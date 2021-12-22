@@ -6,6 +6,8 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <cstdlib>
+#include <cstring>
 #include <vector>
 #include <list>
 #include <map>
@@ -39,7 +41,11 @@
 #define  COL_MAGENTA   "\033[35m"
 
 namespace Utils {
-
+  inline auto str(std::string_view const& str) {
+    static char buf[0x1000];
+    memcpy(buf, str.cbegin(), str.length());
+    return buf;
+  }
 }
 
 template <class T>
