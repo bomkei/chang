@@ -59,7 +59,10 @@ Node* Parser::primary() {
     node->if_true = expr();
 
     if( consume("else") ) {
-      expect("{", false);
+      if( token->str != "if" ) {
+        expect("{");
+      }
+
       node->if_else = expr();
     }
     else {

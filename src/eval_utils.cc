@@ -44,6 +44,11 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
         if( !is_branchable(*it) ) {
           break;
         }
+        else {
+          if( (*it)->kind == NODE_IF && (*it)->if_else ) {
+            break;
+          }
+        }
       }
 
       return v;
@@ -58,7 +63,21 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
 }
 
 std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
-  
+  ObjectType type;
+  auto&& vec = get_return_values(node);
+
+  for( auto it = vec.begin(); it != vec.end(); it++ ) {
+    if( it == vec.begin() ) {
+      type = evaluate(*it);
+      continue;
+    }
+    
+    if( !type.equals(evaluate(*it)) ) {
+      return { false, *it };
+    }
+  }
+
+  return { true, nullptr };
 }
 
 std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {

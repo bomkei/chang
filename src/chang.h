@@ -272,8 +272,8 @@ private:
   //  get all nodes which can be return value
   std::vector<Node*> get_return_values(Node* node);
 
-  // check if all nodes which can be return value be integrated as same types.
-  // argument is must NODE_SCOPE
+  // check if all nodes which can be
+  //  return value has integrated as same types.
   //
   // return:
   //   [true, nullptr]  = integrated
