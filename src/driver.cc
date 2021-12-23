@@ -35,10 +35,18 @@ int Driver::main(int argc, char** argv) {
   alert;
   auto tok = lexer.lex();
 
+  if( global.is_error_occurred )
+    return 0;
+
   Parser parser(tok);
 
   alert;
   auto node = parser.parse();
+
+  global.top_node = node;
+
+  if( global.is_error_occurred )
+    return 0;
 
   if( !global.entry_point ) {
     std::cout << "entry point function 'main' is not defined." << std::endl;
@@ -46,8 +54,12 @@ int Driver::main(int argc, char** argv) {
   }
 
   Evaluater eval;
+
   alert;
   eval.evaluate(node);
+
+  if( global.is_error_occurred )
+    return 0;
 
   Interpreter runner;
   

@@ -80,6 +80,31 @@ std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
   return { true, nullptr };
 }
 
+void Evaluater::must_integrated(Node* node) {
+  assert(node->kind == NODE_SCOPE);
+
+  if( node->list.size() <= 1 )
+    return;
+  
+  auto types = get_return_values(node);
+  auto const first = evaluate(types[0]);
+  auto const firststr = first.to_string();
+
+  if( types.size() <= 1 )
+    return;
+
+  for( auto it = types.begin() + 1; it != types.end(); it++ ) {
+    auto&& eval = evaluate(*it);
+
+    if( !first.equals(eval) ) {
+      error(ERR_TYPE, node->token, "non integrated scope");
+      error(ERR_NOTE, types[0]->token, "was inferred as %s first", firststr.c_str());
+      error(ERR_TYPE, (*it)->token, "expected %s, but found %s", firststr.c_str(), eval.to_string().c_str());
+      return;
+    }
+  }
+}
+
 std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
   for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
 #if __DEBUG__
@@ -212,13 +237,7 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_SCOPE: {
-      alert;
-      for( auto&& i : get_return_values(node) ) {
-        error(ERR_NOTE, i->token, "");
-      }
-
       if( node->list.empty() ) {
-        alert;
         break;
       }
       
@@ -231,6 +250,10 @@ ObjectType Evaluater::evaluate(Node* node) {
         
         i->is_allowed_let = true;
         ret = evaluate(i);
+      }
+
+      if( node != Global::get_instance()->top_node ) {
+        must_integrated(node);
       }
 
       scope_list.pop_front();

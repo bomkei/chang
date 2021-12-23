@@ -99,6 +99,7 @@ struct ObjectType {
   }
 
   bool equals(ObjectType const&) const;
+  std::string to_string() const;
 };
 
 struct Object {
@@ -278,7 +279,9 @@ private:
   // return:
   //   [true, nullptr]  = integrated
   //   [false, <node>]  = not integrated
-  std::pair<bool, Node*> is_integrated(Node* node);
+  std::pair<bool, Node*> is_integrated(Node* node); // dont use
+
+  void must_integrated(Node* node);
 
   std::pair<Node*, std::size_t> find_var(std::string_view const& name);
   Node* find_func(std::string_view const& name);
@@ -334,8 +337,9 @@ struct Global {
   std::string source;
   std::string file_path;
   Node* entry_point = nullptr;
+  Node* top_node = nullptr;
 
-  bool was_error_occurred = false;
+  bool is_error_occurred = false;
 
   static Global* get_instance();
 

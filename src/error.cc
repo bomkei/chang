@@ -12,7 +12,11 @@ void error(ErrorKind kind, Token* token, char const* fmt, ...) {
   std::size_t line = 1;
   std::size_t column = 0;
   std::size_t line_begin, line_end;
-  auto const& src = Global::get_instance()->source;
+
+  auto globl = Global::get_instance();
+  auto const& src = globl->source;
+
+  globl->is_error_occurred = true;
 
   for( std::size_t i = 0; i < token->pos; i += 1 ) {
     if( src[i] == '\n' ) {

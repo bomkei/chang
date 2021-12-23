@@ -10,6 +10,18 @@ bool ObjectType::equals(ObjectType const& type) const {
   return false;
 }
 
+std::string ObjectType::to_string() const {
+  switch( kind ) {
+    case OBJ_INT:
+      return "int";
+    
+    case OBJ_NONE:
+      return "none";
+  }
+
+  return "";
+}
+
 std::string Object::to_string() const {
   switch( type.kind ) {
     case OBJ_INT:
