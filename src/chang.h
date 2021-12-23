@@ -88,11 +88,18 @@ struct Token {
 
 enum ObjectKind {
   OBJ_INT,
+  OBJ_CHAR,
+  OBJ_FLOAT,
+  OBJ_BOOL,
+  OBJ_STRING,
+  OBJ_TUPLE,
   OBJ_NONE
 };
 
 struct ObjectType {
   ObjectKind kind;
+  std::vector<ObjectType> elems;
+  std::size_t arr_depth = 0;
   
   ObjectType(ObjectKind kind = OBJ_NONE)
     : kind(kind) {
@@ -107,6 +114,10 @@ struct Object {
   std::string_view name;
 
   long v_int;
+  char16_t v_char;
+  double v_float;
+  std::u16string v_str;
+  std::vector<Object> list;
 
   std::string to_string() const;
 };
