@@ -140,7 +140,6 @@ Node* Parser::primary() {
 
       if( is_need_semicolon(item) ) {
         error(ERR_EXPECTED, consumed, "expected ';' , because previous statement is can't be return value.");
-        error(ERR_NOTE, item->token, "this is return nothing");
       }
 
       break;
@@ -172,10 +171,33 @@ Node* Parser::primary() {
     return node;
   }
 
-  switch( token->kind ) {
-    case TOK_IDENT: {
-      auto node = new Node(NODE_VARIABLE);
+  auto node = new Node(NODE_VALUE);
 
+  node->token = token;
+
+  switch( token->kind ) {
+    case TOK_INT:
+      node->obj.type = OBJ_INT;
+      node->obj.v_int = atoi(token->str.cbegin());
+      break;
+    
+    case TOK_CHAR:
+      node->obj.type = OBJ_CHAR;
+      node->obj.v_char = *token->str.cbegin();
+      break;
+    
+    case TOK_FLOAT:
+      node->obj.type = OBJ_FLOAT;
+      node->obj.v_float = atof(token->str.cbegin());
+      break;
+    
+    case TOK_STRING:
+      node->obj.type = OBJ_STRING;
+      node->obj.v_str = Utils::String::to_utf16(token->str);
+      break;
+    
+    case TOK_IDENT: {
+      node->kind = NODE_VARIABLE;
       node->token = token;
       node->name = token->str;
 
@@ -195,55 +217,25 @@ Node* Parser::primary() {
         expect(")");
       }
 
-      return node;
+      break;
     }
 
+    case TOK_RESERVED: {
+      node->obj.type = OBJ_BOOL;
 
-    default: {
-      auto node = new Node(NODE_VALUE);
-
-      node->token = token;
-
-      switch( token->kind ) {
-        case TOK_INT:
-          node->obj.type = OBJ_INT;
-          node->obj.v_int = atoi(token->str.cbegin());
-          break;
-        
-        case TOK_CHAR:
-          node->obj.type = OBJ_INT;
-          node->obj.v_int = atoi(token->str.cbegin());
-          break;
-        
-        case TOK_FLOAT:
-          node->obj.type = OBJ_INT;
-          node->obj.v_int = atoi(token->str.cbegin());
-          break;
-        
-        case TOK_STRING:
-          node->obj.type = OBJ_INT;
-          node->obj.v_int = atoi(token->str.cbegin());
-          break;
-        
-        case TOK_RESERVED: {
-          node->obj.type = OBJ_BOOL;
-
-          if( token->str == "true" )
-            node->obj.v_bool = true;
-          else if( token->str == "false" )
-            node->obj.v_bool = false;
-          else
-            goto unk;
-          
-          break;
-        }
-      }
-
-      next();
-      return node;
+      if( token->str == "true" )
+        node->obj.v_bool = true;
+      else if( token->str == "false" )
+        node->obj.v_bool = false;
+      else
+        goto unk;
+      
+      break;
     }
-
   }
+
+  next();
+  return node;
 
 unk:;
   error(ERR_SYNTAX, token, "syntax error");
@@ -361,8 +353,14 @@ Node* Parser::top() {
     expect_ident();
     node->name = token->str;
 
-    if( node->name == "main" ) {
+    auto is_main = node->name == "main";
+
+    if( is_main ) {
       Global::get_instance()->entry_point = node;
+
+      node->type = new Node(NODE_TYPE);
+      node->type->name = "int";
+      node->type->token = node->token;
     }
 
     next();
@@ -376,8 +374,8 @@ Node* Parser::top() {
     }
 
     if( consume("->") ) {
-      if( node->name == "main" ) {
-        error(ERR_UNEXPECTED, consumed, "cannot specify return type of 'main' function, already specified as int automatically.");
+      if( is_main ) {
+        error(ERR_UNEXPECTED, consumed, "cannot specify return type of 'main' function, already specified as int implicity.");
         exit(1);
       }
 
@@ -386,6 +384,11 @@ Node* Parser::top() {
 
     expect("{", false);
     node->expr = expr();
+
+    if( is_main ) {
+      alert;
+      node->expr->list.emplace_back(new Node(NODE_VALUE))->obj.type = OBJ_INT;
+    }
 
     return node;
   }

@@ -1,5 +1,15 @@
 #include "chang.h"
 
+static Evaluater* _instance;
+
+Evaluater::Evaluater() {
+  _instance = this;
+}
+
+Evaluater* Evaluater::get_instance() {
+  return _instance;
+}
+
 bool Evaluater::is_branchable(Node* node) {
   if( !node )
     return false;
@@ -44,8 +54,8 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
         if( !is_branchable(*it) ) {
           break;
         }
-        else {
-          if( (*it)->kind == NODE_IF && (*it)->if_else ) {
+        else { // keep this new line
+          if( (*it)->kind == NODE_IF && (*it)->if_else && (*it)->if_else->kind != NODE_IF ) {
             break;
           }
         }
@@ -80,22 +90,22 @@ std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
   return { true, nullptr };
 }
 
-void Evaluater::must_integrated(Node* node) {
+ObjectType Evaluater::must_integrated(Node* node) {
   assert(node->kind == NODE_SCOPE);
 
-  if( node->list.size() <= 1 )
-    return;
+  //if( node->list.size() <= 1 )
+  //  return { };
   
   auto types = get_return_values(node);
 
   if( types.empty() )
-    return;
+    return { };
 
   auto const first = evaluate(types[0]);
   auto const firststr = first.to_string();
 
   if( types.size() <= 1 )
-    return;
+    return first;
 
   for( auto it = types.begin() + 1; it != types.end(); it++ ) {
     auto&& eval = evaluate(*it);
@@ -104,9 +114,11 @@ void Evaluater::must_integrated(Node* node) {
       error(ERR_TYPE, node->token, "all types of return value is not integrated.");
       error(ERR_NOTE, types[0]->token, "was inferred as '%s' first", firststr.c_str());
       error(ERR_TYPE, (*it)->token, "expected '%s', but found '%s'", firststr.c_str(), eval.to_string().c_str());
-      return;
+      exit(1);
     }
   }
+
+  return first;
 }
 
 std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
@@ -221,7 +233,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         ret = OBJ_NONE;
       else {
         // todo: find struct
-        
+
         error(ERR_TYPE, node->token, "unknown type name");
         exit(1);
       }
@@ -235,7 +247,41 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_FUNCTION: {
-      ret = evaluate(node->expr);
+      auto func_type = evaluate(node->type);
+      auto eval = evaluate(node->expr);
+
+      auto list = get_return_values(node->expr);
+      auto err = false;
+
+      for( auto&& i : list ) {
+        auto&& e = evaluate(i);
+
+        if( !func_type.equals(e) ) {
+          if( !err ) {
+            std::cout << Global::get_instance()->file_path << ": in function '" << node->name << "'" << std::endl;
+            err = true;
+          }
+
+          error(ERR_TYPE, i->token, "expected '%s' , but found '%s'", func_type.to_string().c_str(), e.to_string().c_str());
+          break;
+        }
+      }
+
+      if( err ) {
+        error(ERR_NOTE, node->type->token, "specified here");
+      }
+
+#if __DEBUG__
+      std::vector<ObjectType> v;
+
+      for( auto&& i : get_return_values(node->expr) ) {
+        v.emplace_back(evaluate(i));
+      }
+
+      std::cout << v << std::endl;
+
+#endif
+
       break;
     }
 
@@ -252,11 +298,11 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
         
         i->is_allowed_let = true;
-        ret = evaluate(i);
+        evaluate(i);
       }
 
       if( node != Global::get_instance()->top_node ) {
-        must_integrated(node);
+        ret = must_integrated(node);
       }
 
       scope_list.pop_front();

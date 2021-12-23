@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <cassert>
+#include <codecvt>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -10,6 +11,7 @@
 #include <cstring>
 #include <vector>
 #include <list>
+#include <locale>
 #include <map>
 
 #define  __DEBUG__  1
@@ -47,6 +49,23 @@ namespace Utils {
     buf[str.length()] = 0;
     return buf;
   }
+
+  class String {
+    static inline std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> conv;
+
+  public:
+    static std::string to_utf8(std::u16string const& str) {
+      return conv.to_bytes(str);
+    }
+
+    static std::u16string to_utf16(std::string const& str) {
+      return conv.from_bytes(str);
+    }
+
+    static std::u16string to_utf16(std::string_view const& str) {
+      return conv.from_bytes(std::string(str.cbegin(), str.length()));
+    }
+  };
 }
 
 template <class T>
@@ -57,6 +76,25 @@ concept HaveMethodForString = requires (T const& x) {
 template <HaveMethodForString T>
 auto& operator << (std::ostream& ost, T const& x) {
   return ost << x.to_string();
+}
+
+template <HaveMethodForString T>
+auto& operator << (std::ostream& ost, std::vector<T> const& vec) {
+  for( auto&& i : vec )
+    ost << i;
+  
+  return ost;
+}
+
+template <class T, class F>
+auto to_vector(std::vector<T> const& vec, F func) {
+  std::vector<decltype(func(T()))> ret;
+
+  for( auto&& i : vec ) {
+    ret.emplace_back(func(i));
+  }
+  
+  return ret;
 }
 
 enum TokenKind {
@@ -94,6 +132,15 @@ struct Token {
     tok->next = this->next;
 
     this->next = tok;
+    return tok;
+  }
+
+  static Token* from_string(std::string_view const& str, TokenKind kind = TOK_IDENT) {
+    auto tok = new Token;
+
+    tok->kind = kind;
+    tok->str = str;
+
     return tok;
   }
 };
@@ -254,6 +301,7 @@ private:
 
   std::size_t pass_num();
   std::size_t pass_ident();
+  std::size_t pass_string();
 
   std::string const& source;
   std::size_t position;
@@ -292,7 +340,11 @@ private:
 
 class Evaluater {
 public:
+  Evaluater();
+
   ObjectType evaluate(Node* node);
+
+  static Evaluater* get_instance();
 
 private:
   bool is_branchable(Node* node);
@@ -308,7 +360,7 @@ private:
   //   [false, <node>]  = not integrated
   std::pair<bool, Node*> is_integrated(Node* node); // dont use
 
-  void must_integrated(Node* node);
+  ObjectType must_integrated(Node* node);
 
   std::pair<Node*, std::size_t> find_var(std::string_view const& name);
   Node* find_func(std::string_view const& name);

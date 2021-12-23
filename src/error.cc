@@ -9,12 +9,12 @@ void error(ErrorKind kind, Token* token, char const* fmt, ...) {
   vsprintf(buf, fmt, ap);
   va_end(ap);
 
-  std::size_t line = 1;
-  std::size_t column = 0;
-  std::size_t line_begin, line_end;
-
   auto globl = Global::get_instance();
   auto const& src = globl->source;
+
+  std::size_t line = 1;
+  std::size_t column = 0;
+  std::size_t line_begin = 0, line_end = src.length();
 
   globl->is_error_occurred = true;
 

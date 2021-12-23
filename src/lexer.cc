@@ -1,8 +1,11 @@
 #include "chang.h"
 
-static char const* operator_token_list[] = {"...", ">>=", "<<=", "<=>", "->", "<-", ">=", "<=", ">>", "<<",
-  "==", "!=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "[]", "&&", "||", "::", "!", "=", ".", ",", "?", "~", ">", "<",
-  "%", "&", "^", "|", "(", ")", "[", "]", "{", "}", ";", ":", "+", "-", "*", "/", "@"};
+static char const* operator_token_list[] = {
+  "false", "true",
+  "...", ">>=", "<<=", "<=>", "->", "<-", ">=", "<=", ">>", "<<", "==", "!=", "+=",
+  "-=", "*=", "/=", "%=", "&=", "|=", "[]", "&&", "||", "::", "!", "=", ".", ",", "?",
+  "~", ">", "<", "%", "&", "^", "|", "(", ")", "[", "]", "{", "}", ";", ":", "+", "-", "*", "/", "@"
+};
 
 Lexer::Lexer(std::string const& src)
   : source(src), position(0) {
@@ -32,7 +35,8 @@ Token* Lexer::lex() {
           continue;
         }
 
-        
+        cur->kind = TOK_FLOAT;
+        cur->str = { str, pass_num() + cur->str.length() + 1 };
       }
     }
 
@@ -41,6 +45,15 @@ Token* Lexer::lex() {
       cur->kind = TOK_IDENT;
       cur->str = { str, pass_ident() };
     }
+
+    // string
+    else if( ch == '"' ) {
+      cur->kind = TOK_STRING;
+
+      cur->pos = position += 1;
+      cur->str = { str + 1, pass_string() };
+    }
+
     else {
       for( std::string_view&& op : operator_token_list ) {
         if( match(op) ) {
@@ -52,6 +65,7 @@ Token* Lexer::lex() {
       }
 
       error(ERR_LEX, cur, "unknown token");
+      exit(1);
     such_op:;
     }
 
@@ -99,5 +113,16 @@ std::size_t Lexer::pass_ident() {
     position += 1;
   }
 
+  return len;
+}
+
+std::size_t Lexer::pass_string() {
+  std::size_t len = 0;
+
+  while( check() && peek() != '"' ) {
+    len++, position++;
+  }
+
+  position++;
   return len;
 }
