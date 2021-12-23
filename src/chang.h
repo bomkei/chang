@@ -50,6 +50,13 @@ namespace Utils {
     return buf;
   }
 
+  inline std::string remove_zero(std::string&& s) {
+    while( !s.empty() && *s.rbegin() == '0' )
+      s.pop_back();
+    
+    return s;
+  }
+
   class String {
     static inline std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> conv;
 
