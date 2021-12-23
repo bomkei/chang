@@ -84,6 +84,18 @@ struct Token {
       back->next = this;
     }
   }
+
+  Token* insert(std::string_view const& str, TokenKind kind = TOK_RESERVED) {
+    auto tok = new Token;
+
+    tok->kind = kind;
+    tok->str = str;
+    tok->back = this;
+    tok->next = this->next;
+
+    this->next = tok;
+    return tok;
+  }
 };
 
 enum ObjectKind {
@@ -212,6 +224,8 @@ struct Node {
   // variable
   Node* var_scope;
   long var_index = -1;
+
+  std::size_t arr_depth = 0;
 
   // if self is NODE_VAR, this is can use to check if placed self on allowed area.
   // example for, root in scope.

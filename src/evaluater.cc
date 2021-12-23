@@ -190,7 +190,6 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       throw 0;
-
       // todo: user defined
 
     check_process:;
@@ -210,9 +209,19 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_TYPE: {
       if( node->name == "int" )
         ret = OBJ_INT;
+      else if( node->name == "char" )
+        ret = OBJ_CHAR;
+      else if( node->name == "float" )
+        ret = OBJ_FLOAT;
+      else if( node->name == "bool" )
+        ret = OBJ_BOOL;
+      else if( node->name == "string" )
+        ret = OBJ_STRING;
       else if( node->name == "none" )
         ret = OBJ_NONE;
       else {
+        // todo: find struct
+        
         error(ERR_TYPE, node->token, "unknown type name");
         exit(1);
       }

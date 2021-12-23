@@ -71,6 +71,23 @@ Node* Parser::expect_type() {
 
   next();
 
+  if( consume("<") ) {
+    do {
+      node->list.emplace_back(expect_type());
+    } while( consume(",") );
+
+    if( token->str == ">>" ) {
+      token->str = ">";
+      token->insert(">");
+    }
+
+    expect(">");
+  }
+
+  while( consume("[]") ) {
+    node->arr_depth++;
+  }
+
   return node;
 }
 
