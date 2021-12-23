@@ -91,13 +91,6 @@ void Evaluater::must_integrated(Node* node) {
   if( types.empty() )
     return;
 
-#if __DEBUG__
-  alert;
-  for( auto&& i : types ) {
-    fprintf(stderr,"%s\n",evaluate(i).to_string().c_str());
-  }
-#endif
-
   auto const first = evaluate(types[0]);
   auto const firststr = first.to_string();
 
@@ -291,6 +284,9 @@ ObjectType Evaluater::evaluate(Node* node) {
 
         if( node->type && !expr_t.equals(obj.type) ) {
           error(ERR_TYPE, node->token, "type mismatch");
+        }
+        else {
+          obj.type = expr_t;
         }
       }
 
