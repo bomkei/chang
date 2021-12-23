@@ -156,17 +156,6 @@ Node* Parser::primary() {
   }
 
   switch( token->kind ) {
-    case TOK_INT: {
-      auto node = new Node(NODE_VALUE);
-
-      node->token = token;
-      node->obj.type = OBJ_INT;
-      node->obj.v_int = atoi(token->str.cbegin());
-
-      next();
-      return node;
-    }
-
     case TOK_IDENT: {
       auto node = new Node(NODE_VARIABLE);
 
@@ -191,8 +180,55 @@ Node* Parser::primary() {
 
       return node;
     }
+
+
+    default: {
+      auto node = new Node(NODE_VALUE);
+
+      node->token = token;
+
+      switch( token->kind ) {
+        case TOK_INT:
+          node->obj.type = OBJ_INT;
+          node->obj.v_int = atoi(token->str.cbegin());
+          break;
+        
+        case TOK_CHAR:
+          node->obj.type = OBJ_INT;
+          node->obj.v_int = atoi(token->str.cbegin());
+          break;
+        
+        case TOK_FLOAT:
+          node->obj.type = OBJ_INT;
+          node->obj.v_int = atoi(token->str.cbegin());
+          break;
+        
+        case TOK_STRING:
+          node->obj.type = OBJ_INT;
+          node->obj.v_int = atoi(token->str.cbegin());
+          break;
+        
+        case TOK_RESERVED: {
+          node->obj.type = OBJ_BOOL;
+
+          if( token->str == "true" )
+            node->obj.v_bool = true;
+          else if( token->str == "false" )
+            node->obj.v_bool = false;
+          else
+            goto unk;
+          
+          break;
+        }
+      }
+
+      next();
+      return node;
+    }
+
   }
 
+unk:;
   error(ERR_SYNTAX, token, "syntax error");
   exit(1);
 }

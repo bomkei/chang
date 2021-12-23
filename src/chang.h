@@ -116,6 +116,7 @@ struct Object {
   long v_int;
   char16_t v_char;
   double v_float;
+  bool v_bool;
   std::u16string v_str;
   std::vector<Object> list;
 
