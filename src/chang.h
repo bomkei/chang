@@ -180,6 +180,7 @@ struct BuiltinFunc;
 struct Node {
   struct ExprPair {
     ExprKind kind;
+    Token* token;
     Node* item;
   };
 

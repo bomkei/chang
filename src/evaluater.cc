@@ -311,7 +311,9 @@ ObjectType Evaluater::evaluate(Node* node) {
       ret = evaluate(node->expr);
 
       for( auto&& item : node->expr_list ) {
-        evaluate(item.item);
+        if( !ret.equals(evaluate(item.item)) ) {
+          error(ERR_TYPE, item.token, "type mismatch");
+        }
       }
 
       break;

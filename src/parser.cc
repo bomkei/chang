@@ -269,7 +269,7 @@ Node* Parser::mul() {
       else
         break;
 
-      expr->expr_list.emplace_back(Node::ExprPair{ kind, member() });
+      expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, member() });
     }
 
     return expr;
@@ -296,7 +296,7 @@ Node* Parser::add() {
       else
         break;
       
-      expr->expr_list.emplace_back(Node::ExprPair{ kind, mul() });
+      expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, mul() });
     }
 
     return expr;
