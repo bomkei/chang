@@ -61,7 +61,7 @@ std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
   
 }
 
-std::tuple<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
+std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
   for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
 #if __DEBUG__
     alert;
@@ -77,4 +77,16 @@ std::tuple<Node*, std::size_t> Evaluater::find_var(std::string_view const& name)
   }
   
   return { nullptr, 0 };
+}
+
+Node* Evaluater::find_func(std::string_view const& name) {
+  for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
+    for( auto&& i : (*it)->list ) {
+      if( i->kind == NODE_FUNCTION && i->name == name ) {
+        return i;
+      }
+    }
+  }
+
+  return nullptr;
 }

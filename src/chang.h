@@ -280,7 +280,8 @@ private:
   //   [false, <node>]  = not integrated
   std::pair<bool, Node*> is_integrated(Node* node);
 
-  std::tuple<Node*, std::size_t> find_var(std::string_view const& name);
+  std::pair<Node*, std::size_t> find_var(std::string_view const& name);
+  Node* find_func(std::string_view const& name);
 
   std::list<Node*> scope_list;
 };

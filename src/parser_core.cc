@@ -29,13 +29,10 @@ Node* Parser::primary() {
 
         continue;
       }
-      else {
+      else if( token->str != "}" ) {
         switch( item->kind ) {
           case NODE_IF:
-            if( token->str != "}" ) {
-              continue;
-            }
-            break;
+            continue;
         }
       }
 
@@ -240,6 +237,11 @@ Node* Parser::top() {
     }
 
     if( consume("->") ) {
+      if( node->name == "main" ) {
+        error(ERR_UNEXPECTED, consumed, "cannot specify return type of 'main' function, already specified as int automatically.");
+        exit(1);
+      }
+
       node->type = expect_type();
     }
 
