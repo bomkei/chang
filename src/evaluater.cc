@@ -87,6 +87,17 @@ void Evaluater::must_integrated(Node* node) {
     return;
   
   auto types = get_return_values(node);
+
+  if( types.empty() )
+    return;
+
+#if __DEBUG__
+  alert;
+  for( auto&& i : types ) {
+    fprintf(stderr,"%s\n",evaluate(i).to_string().c_str());
+  }
+#endif
+
   auto const first = evaluate(types[0]);
   auto const firststr = first.to_string();
 
@@ -97,9 +108,9 @@ void Evaluater::must_integrated(Node* node) {
     auto&& eval = evaluate(*it);
 
     if( !first.equals(eval) ) {
-      error(ERR_TYPE, node->token, "non integrated scope");
-      error(ERR_NOTE, types[0]->token, "was inferred as %s first", firststr.c_str());
-      error(ERR_TYPE, (*it)->token, "expected %s, but found %s", firststr.c_str(), eval.to_string().c_str());
+      error(ERR_TYPE, node->token, "all types of return value is not integrated.");
+      error(ERR_NOTE, types[0]->token, "was inferred as '%s' first", firststr.c_str());
+      error(ERR_TYPE, (*it)->token, "expected '%s', but found '%s'", firststr.c_str(), eval.to_string().c_str());
       return;
     }
   }
@@ -139,10 +150,6 @@ ObjectType Evaluater::evaluate(Node* node) {
   if( !node )
     return { };
 
-#if __DEBUG__
-  fprintf(stderr,"node->kind = %d\n",node->kind);
-#endif
-
   if( node->evaluated )
     return node->objtype;
 
@@ -157,12 +164,6 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_VARIABLE: {
       alert;
       auto [scope, index] = find_var(node->name);
-
-#if __DEBUG__
-      alert;
-      fprintf(stderr,"scope = %p\n",scope);
-      fprintf(stderr,"index = %lu\n",index);
-#endif
 
       if( scope ) {
         node->var_scope = scope;
