@@ -86,10 +86,10 @@ Node* Parser::expect_type() {
 
   while( consume("[") ) {
     if( consume("]") ) {
-      node->arr_depth_list.emplace_back(nullptr);
+      node->elemcount_list.emplace_back(nullptr);
     }
     else {
-      node->arr_depth_list.emplace_back(expr());
+      node->elemcount_list.emplace_back(expr());
       expect("]");
     }
   }

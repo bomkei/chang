@@ -70,15 +70,16 @@ Object Interpreter::run_node(Node* node) {
       return run_lvalue(node);
 
     case NODE_ARRAY: {
-      auto const& ec = *var_stmt_list.begin();
+      Object obj;
 
-      // if( node->is_allowed_empty_array ) {
-      //   Object obj;
-      //   obj.type = node->objtype;
+      obj.type = node->objtype;
 
-      //   for( std::size_t i = 0; i < 
-      //   return obj;
-      // }
+      if( node->is_allowed_empty_array ) {
+        
+      }
+      else {
+
+      }
 
       break;
     }
@@ -110,16 +111,22 @@ Object Interpreter::run_node(Node* node) {
   
     case NODE_VAR: {
       // if( node->is_make_array ) {
-      //   for( std::size_t i = 0; i < node->arr_depth_list.size(); i++ ) {
-      //     node->objects[i] = run_node(node->arr_depth_list[i]);
+      //   for( std::size_t i = 0; i < node->elemcount_list.size(); i++ ) {
+      //     node->objects[i] = run_node(node->elemcount_list[i]);
       //   }
       // }
 
-      enter_var_stmt(node);
+      auto ec_it = node->objects.begin();
+
+      for( auto&& ec : node->elemcount_list ) {
+        if( ec != nullptr ) {
+          *ec_it++ = run_node(ec);
+          //ec_it++;
+        }
+      }
 
       node->get_var() = run_node(node->expr);
       
-      leave_var_stmt();
       break;
     }
 

@@ -22,21 +22,33 @@ bool Evaluater::is_branchable(Node* node) {
   return false;
 }
 
-void Evaluater::check_array(long depth, typename std::vector<Node*>::const_iterator it, Node* array) {
+void Evaluater::check_array(
+  long depth,
+  std::vector<Node*>& uninitialized_list,
+  typename std::vector<Node*>::const_iterator elemcount_it,
+  Node* array
+  ) {
+  auto cur_var_s = *var_stmt_list.begin();
+
   if( depth == 0 )
     return;
 
-  if( *it != nullptr ) {
+  if( *elemcount_it != nullptr ) {
+    assert(array->is_allowed_empty_array);
+
     if( array->kind != NODE_ARRAY ) {
       error(ERR_TYPE, array->token, "expected empty array");
     }
     else if( !array->list.empty() ) {
       error(ERR_TYPE, array->token, "array is must empty");
     }
+    else { // it is array, and empty
+      array->elemcount = &cur_var_s->objects.emplace_back();
+    }
   }
 
   for( auto&& i : array->list ) {
-    check_array(depth - 1, it + 1, i);
+    check_array(depth - 1, uninitialized_list, elemcount_it + 1, i);
   }
 }
 
@@ -118,22 +130,16 @@ ObjectType Evaluater::must_integrated(Node* node) {
 
   auto types = get_return_values(node);
 
-  alert;
-  for( auto&& i : types ) {
-    std::cout << evaluate(i) << std::endl;
-    error(ERR_NOTE, i->token, "");
-  }
-
   if( types.empty() ) {
-    alert;
     return { };
   }
 
   auto const first = evaluate(types[0]);
   auto const&& firststr = first.to_string();
 
-  if( types.size() <= 1 )
+  if( types.size() <= 1 ) {
     return first;
+  }
 
   for( auto it = types.begin() + 1; it != types.end(); it++ ) {
     auto&& eval = evaluate(*it);
@@ -189,7 +195,6 @@ ObjectType Evaluater::evaluate(Node* node) {
       break;
     
     case NODE_VARIABLE: {
-      alert;
       auto [scope, index] = find_var(node->name);
 
       if( scope ) {
@@ -204,6 +209,7 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
     
     case NODE_ARRAY: {
+      
       if( node->is_allowed_empty_array ) {
         if( node->list.empty() ) {
           return node->objtype;
@@ -227,7 +233,7 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       first.arr_depth += 1;
-      return first;
+      return ret = first;
     }
 
     case NODE_CALLFUNC: {
@@ -287,7 +293,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         exit(1);
       }
 
-      for( auto&& i : node->arr_depth_list ) {
+      for( auto&& i : node->elemcount_list ) {
         if( i && !evaluate(i).equals(OBJ_INT) ) {
           error(ERR_TYPE, i->token, "elements count is must be integer");
         }
@@ -349,9 +355,6 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       if( node != Global::get_instance()->top_node ) {
         ret = must_integrated(node);
-
-        alert;
-        std::cout << ret << std::endl;
       }
 
       scope_list.pop_front();
@@ -359,6 +362,8 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_VAR: {
+      var_stmt_list.push_front(node);
+
       if( !node->is_allowed_let ) {
         error(ERR_LOCATION, node->token, "cannot declare variable here");
         exit(1);
@@ -399,6 +404,7 @@ ObjectType Evaluater::evaluate(Node* node) {
           if( !expr_type.equals(specified_type) ) {
             std::cout << specified_type << ", " << expr_type << std::endl;
             error(ERR_TYPE, node->token, "type mismatch");
+            var_stmt_list.pop_front();
             break;
           }
         }
@@ -408,10 +414,11 @@ ObjectType Evaluater::evaluate(Node* node) {
 
         if( node->type && specified_type.arr_depth ) {
           node->is_make_array = true;
-          check_array(specified_type.arr_depth, node->type->arr_depth_list.cbegin(), node->expr);
+          check_array(specified_type.arr_depth, node->list, node->type->elemcount_list.cbegin(), node->expr);
         }
       }
 
+      var_stmt_list.pop_front();
       break;
     }
 
