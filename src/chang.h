@@ -198,7 +198,7 @@ enum NodeKind {
 
   NODE_ARRAY,
   NODE_INDEX_REF,
-  
+
   NODE_MEMBER_ACCESS,
 
   // argument
@@ -292,6 +292,10 @@ struct Node {
   // built-in func
   BuiltinFunc const* builtin = nullptr;
 
+  Object& get_var() const {
+    return var_scope->objects[var_index];
+  }
+
   long find_var(std::string_view const& name);
 
   Node(NodeKind kind);
@@ -360,6 +364,9 @@ public:
 private:
   bool is_branchable(Node* node);
 
+  // check
+  void check_array(long depth, typename std::vector<Node*>::const_iterator it, Node* array);
+
   //  get all nodes which can be return value
   std::vector<Node*> get_return_values(Node* node);
 
@@ -383,6 +390,10 @@ class Interpreter {
 public:
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
+
+  //Object construct_obj(ObjectType const& type);
+  
+  //void fit_arr_len(long count, Object& obj);
 
   static void add(Object& obj, Object& val);
   static void sub(Object& obj, Object& val);

@@ -39,7 +39,7 @@ Object& Interpreter::run_lvalue(Node* node) {
 
   switch( node->kind ) {
     case NODE_VARIABLE: {
-      return node->var_scope->objects[node->var_index];
+      return node->get_var();
     }
   }
 
@@ -85,7 +85,7 @@ Object Interpreter::run_node(Node* node) {
     }
   
     case NODE_VAR: {
-      node->var_scope->objects[node->var_index] = run_node(node->expr);
+      node->get_var() = run_node(node->expr);
       break;
     }
 

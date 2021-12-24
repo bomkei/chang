@@ -22,6 +22,29 @@ bool Evaluater::is_branchable(Node* node) {
   return false;
 }
 
+void Evaluater::check_array(long depth, typename std::vector<Node*>::const_iterator it, Node* array) {
+  alert;
+
+  if( depth == 0 )
+    return;
+
+  alert;
+  error(ERR_NOTE, (*it)->token, "");
+
+  if( *it != nullptr ) {
+    if( array->kind != NODE_ARRAY ) {
+      error(ERR_TYPE, array->token, "expected empty array");
+    }
+    else if( !array->list.empty() ) {
+      error(ERR_TYPE, array->token, "array is must empty");
+    }
+  }
+
+  for( auto&& i : array->list ) {
+    check_array(depth - 1, it + 1, i);
+  }
+}
+
 std::vector<Node*> Evaluater::get_return_values(Node* node) {
   using Vec = std::vector<Node*>;
 
@@ -181,6 +204,19 @@ ObjectType Evaluater::evaluate(Node* node) {
       exit(1);
     }
     
+    case NODE_ARRAY: {
+      auto first = evaluate(node->list[0]);
+
+      for( auto it = node->list.begin() + 1; it != node->list.end(); it++ ) {
+        if( !first.equals(evaluate(*it)) ) {
+          error(ERR_TYPE, (*it)->token, "type mismatch");
+        }
+      }
+
+      first.arr_depth += 1;
+      return first;
+    }
+
     case NODE_CALLFUNC: {
       auto const& builtin = BuiltinFunc::get_list();
 
@@ -236,6 +272,14 @@ ObjectType Evaluater::evaluate(Node* node) {
 
         error(ERR_TYPE, node->token, "unknown type name");
         exit(1);
+      }
+
+      for( auto&& i : node->arr_depth_list ) {
+        if( i && !evaluate(i).equals(OBJ_INT) ) {
+          error(ERR_TYPE, i->token, "elements count is must be integer");
+        }
+
+        ret.arr_depth++;
       }
 
       break;
@@ -319,22 +363,32 @@ ObjectType Evaluater::evaluate(Node* node) {
       node->var_scope = cur;
       node->var_index = cur->objects.size() - 1;
 
+      auto specified_type = evaluate(node->type);
+
       if( node->type ) {
-        obj.type = evaluate(node->type);
+        obj.type = specified_type;
       }
 
+      // have initializer expr
       if( node->expr ) {
-        auto expr_t = evaluate(node->expr);
+        auto expr_type = evaluate(node->expr);
 
-        if( node->type && !expr_t.equals(obj.type) ) {
-          error(ERR_TYPE, node->token, "type mismatch");
+        // not matching types which specify and initializer
+        if( node->type ) {
+          if( !expr_type.equals(specified_type) ) {
+            error(ERR_TYPE, node->token, "type mismatch");
+          }
         }
         else {
-          obj.type = expr_t;
+          obj.type = expr_type;
         }
 
-        if( node->type && !node->type->arr_depth_list.empty() ) {
-          
+        alert;
+        fprintf(stderr,"%p  %lu\n",node->type,specified_type.arr_depth);
+
+        if( node->type && specified_type.arr_depth ) {
+          alert;
+          check_array(specified_type.arr_depth, node->type->arr_depth_list.cbegin(), node->expr);
         }
       }
 

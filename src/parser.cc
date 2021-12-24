@@ -90,6 +90,7 @@ Node* Parser::expect_type() {
     }
     else {
       node->arr_depth_list.emplace_back(expr());
+      alert;
       expect("]");
     }
   }
@@ -118,7 +119,7 @@ Node* Parser::primary() {
     auto x = new Node(NODE_ARRAY);
 
     if( consume("]") ) {
-      error(ERR_SYNTAX, consumed, "empty array is invalid due to cannot infer a type of it");
+      error(ERR_SYNTAX, consumed, "empty array is invalid due to cannot infer a type");
       return nullptr;
     }
 
@@ -239,7 +240,7 @@ Node* Parser::primary() {
         expect(")");
       }
 
-      break;
+      return node;
     }
 
     case TOK_RESERVED: {
