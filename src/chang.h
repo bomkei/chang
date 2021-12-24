@@ -192,6 +192,18 @@ struct Object {
   std::vector<Object> list;
 
   std::string to_string() const;
+
+  static Object construct_from_type(ObjectType type) {
+    Object obj;
+    obj.type = type;
+
+    if( type.arr_depth ) {
+      type.arr_depth -= 1;
+      obj.list.emplace_back(construct_from_type(type));
+    }
+
+    return obj;
+  }
 };
 
 enum NodeKind {
@@ -375,12 +387,7 @@ private:
   bool is_branchable(Node* node);
 
   // check array
-  void check_array(
-    long depth,
-    std::vector<Node*>& uninitialized_list,
-    typename std::vector<Node*>::const_iterator elemcount_it,
-    Node* array
-  );
+  void check_array(std::vector<Node*>::const_iterator ec_list_it, std::size_t depth, Node* arr);
 
   //  get all nodes which can be return value
   std::vector<Node*> get_return_values(Node* node);
@@ -409,7 +416,8 @@ public:
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
 
-  Object construct_array(Node* node);
+  //Object construct_array(Node* node);
+  void fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr);
 
   static Interpreter* get_instance();
 

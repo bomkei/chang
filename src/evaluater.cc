@@ -22,6 +22,29 @@ bool Evaluater::is_branchable(Node* node) {
   return false;
 }
 
+void Evaluater::check_array(std::vector<Node*>::const_iterator ec_list_it, std::size_t depth, Node* arr) {
+  auto arr_type = evaluate(arr);
+
+  if( arr_type.arr_depth != depth ) {
+    error(ERR_TYPE, arr->token, "type mismatch");
+    return;
+  }
+
+  if( *ec_list_it != nullptr ) {
+    if( arr->kind != NODE_ARRAY ) {
+      error(ERR_TYPE, arr->token, "err aaaa");
+      return;
+    }
+    else if( !arr->list.empty() ) {
+      error(ERR_TYPE, arr->token, "err jiojio");
+      return;
+    }
+
+    
+  }
+}
+
+/*
 void Evaluater::check_array(
   long depth,
   std::vector<Node*>& uninitialized_list,
@@ -54,7 +77,7 @@ void Evaluater::check_array(
   for( auto&& i : array->list ) {
     check_array(depth - 1, uninitialized_list, elemcount_it + 1, i);
   }
-}
+}*/
 
 std::vector<Node*> Evaluater::get_return_values(Node* node) {
   using Vec = std::vector<Node*>;
@@ -444,6 +467,8 @@ ObjectType Evaluater::evaluate(Node* node) {
               }
             }
           }
+
+          check_array(node->type->elemcount_list, specified_type.arr_depth, node->expr);
 
         }
       }

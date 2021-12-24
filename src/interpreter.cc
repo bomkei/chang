@@ -42,8 +42,10 @@ void Interpreter::div(Object& obj, Object& item) {
   }
 }
 
-Object Interpreter::construct_array(Node* node) {
+void Interpreter::fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr) {
   
+
+
 }
 
 Object& Interpreter::run_lvalue(Node* node) {
