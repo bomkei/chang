@@ -119,9 +119,13 @@ Node* Parser::primary() {
     x->token = consumed;
 
     if( consume("]") ) {
-      error(ERR_SYNTAX, consumed, "empty array is invalid due to cannot infer a type");
-      return nullptr;
+      return x;
     }
+
+    // if( consume("]") ) {
+    //   error(ERR_SYNTAX, consumed, "empty array is invalid due to cannot infer a type");
+    //   return nullptr;
+    // }
 
     do {
       x->list.emplace_back(expr());

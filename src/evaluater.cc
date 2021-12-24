@@ -191,6 +191,20 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
     
     case NODE_ARRAY: {
+      if( node->is_allowed_empty_array ) {
+        if( node->list.empty() ) {
+          return node->objtype;
+        }
+        
+        for( auto&& i : node->list ) {
+          i->is_allowed_empty_array = true;
+          i->objtype = node->objtype;
+        }
+      }
+      else if( node->list.empty() ) {
+        error(ERR_TYPE, node->token, "empty array is invalid");
+      }
+
       auto first = evaluate(node->list[0]);
 
       for( auto it = node->list.begin() + 1; it != node->list.end(); it++ ) {
@@ -357,11 +371,15 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       // have initializer expr
       if( node->expr ) {
+        node->expr->is_allowed_empty_array = true;
+        (node->expr->objtype = specified_type).arr_depth = 1;
+
         auto expr_type = evaluate(node->expr);
 
         // not matching types which specify and initializer
         if( node->type ) {
           if( !expr_type.equals(specified_type) ) {
+            std::cout << specified_type << ", " << expr_type << std::endl;
             error(ERR_TYPE, node->token, "type mismatch");
             break;
           }
@@ -371,6 +389,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
 
         if( node->type && specified_type.arr_depth ) {
+
           check_array(specified_type.arr_depth, node->type->arr_depth_list.cbegin(), node->expr);
         }
       }

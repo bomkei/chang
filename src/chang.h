@@ -289,6 +289,9 @@ struct Node {
   // example for, root in scope.
   bool is_allowed_let = false;
 
+  // is allowed empty arr
+  bool is_allowed_empty_array = false;
+
   // built-in func
   BuiltinFunc const* builtin = nullptr;
 

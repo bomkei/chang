@@ -14,27 +14,39 @@ bool ObjectType::equals(ObjectType const& type) const {
 }
 
 std::string ObjectType::to_string() const {
+  std::string name;
+
   switch( kind ) {
     case OBJ_INT:
-      return "int";
+      name = "int";
+      break;
     
     case OBJ_CHAR:
-      return "char";
+      name = "char";
+      break;
     
     case OBJ_FLOAT:
-      return "float";
+      name = "float";
+      break;
     
     case OBJ_STRING:
-      return "string";
+      name = "string";
+      break;
     
     case OBJ_BOOL:
-      return "bool";
+      name = "bool";
+      break;
     
     case OBJ_NONE:
-      return "none";
+      name = "none";
+      break;
   }
 
-  return "";
+  for( std::size_t i = 0; i < arr_depth; i++ ) {
+    name += "[]";
+  }
+
+  return name;
 }
 
 std::string Object::to_string() const {
