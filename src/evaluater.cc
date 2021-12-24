@@ -85,12 +85,17 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
     case NODE_FUNCTION: {
       return get_return_values(node->expr);
     }
+
+    case NODE_VAR:
+      return { };
   }
 
   return { node };
 }
 
 std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
+  // dont use
+
   ObjectType type;
   auto&& vec = get_return_values(node);
 
@@ -113,11 +118,19 @@ ObjectType Evaluater::must_integrated(Node* node) {
 
   auto types = get_return_values(node);
 
-  if( types.empty() )
+  alert;
+  for( auto&& i : types ) {
+    std::cout << evaluate(i) << std::endl;
+    error(ERR_NOTE, i->token, "");
+  }
+
+  if( types.empty() ) {
+    alert;
     return { };
+  }
 
   auto const first = evaluate(types[0]);
-  auto const firststr = first.to_string();
+  auto const&& firststr = first.to_string();
 
   if( types.size() <= 1 )
     return first;
@@ -127,7 +140,7 @@ ObjectType Evaluater::must_integrated(Node* node) {
 
     if( !first.equals(eval) ) {
       error(ERR_TYPE, node->token, "all types of return value is not integrated.");
-      error(ERR_NOTE, types[0]->token, "was inferred as '%s' first", firststr.c_str());
+      error(ERR_NOTE, types[0]->token, "was inferred as '%s' here", firststr.c_str());
       error(ERR_TYPE, (*it)->token, "expected '%s', but found '%s'", firststr.c_str(), eval.to_string().c_str());
       exit(1);
     }
@@ -336,6 +349,9 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       if( node != Global::get_instance()->top_node ) {
         ret = must_integrated(node);
+
+        alert;
+        std::cout << ret << std::endl;
       }
 
       scope_list.pop_front();
@@ -371,13 +387,15 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       // have initializer expr
       if( node->expr ) {
-        node->expr->is_allowed_empty_array = true;
-        (node->expr->objtype = specified_type).arr_depth = 1;
+        if( specified_type.arr_depth ) {
+          node->expr->is_allowed_empty_array = true;
+          (node->expr->objtype = specified_type).arr_depth = 1;
+        }
 
         auto expr_type = evaluate(node->expr);
 
-        // not matching types which specify and initializer
         if( node->type ) {
+          // not matching types which specify and initializer
           if( !expr_type.equals(specified_type) ) {
             std::cout << specified_type << ", " << expr_type << std::endl;
             error(ERR_TYPE, node->token, "type mismatch");

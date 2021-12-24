@@ -8,6 +8,7 @@ static char const* operator_token_list[] = {
   "break",
   "true",
   "loop",
+  "var",
   "for",
   "if",
   "do",

@@ -1,5 +1,15 @@
 #include "chang.h"
 
+static Interpreter* _instance;
+
+Interpreter::Interpreter() {
+  _instance = this;
+}
+
+Interpreter* Interpreter::get_instance() {
+  return _instance;
+}
+
 void Interpreter::add(Object& obj, Object& item) {
   switch( obj.type.kind ) {
     case OBJ_INT:
@@ -62,15 +72,15 @@ Object Interpreter::run_node(Node* node) {
     case NODE_ARRAY: {
       auto const& ec = *var_stmt_list.begin();
 
-      if( node->is_allowed_empty_array ) {
-        Object obj;
-        obj.type = node->objtype;
+      // if( node->is_allowed_empty_array ) {
+      //   Object obj;
+      //   obj.type = node->objtype;
 
-        for( std::size_t i = 0; i < 
-        return obj;
-      }
+      //   for( std::size_t i = 0; i < 
+      //   return obj;
+      // }
 
-
+      break;
     }
 
     case NODE_CALLFUNC: {

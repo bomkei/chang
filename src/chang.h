@@ -392,12 +392,12 @@ private:
 
 class Interpreter {
 public:
+  Interpreter();
+
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
 
-  //Object construct_obj(ObjectType const& type);
-  
-  //void fit_arr_len(long count, Object& obj);
+  static Interpreter* get_instance();
 
   static void add(Object& obj, Object& val);
   static void sub(Object& obj, Object& val);
@@ -414,12 +414,12 @@ private:
       auto p = ec;
 
       for( auto it = list.begin(); it != list.end(); it++ ) {
-        if( it == list.first() ) {
-          ec->count = run_node(*it).v_int;
+        if( it == list.begin() ) {
+          ec->count = Interpreter::get_instance()->run_node(*it).v_int;
         }
         else {
           auto n = new ElemCount;
-          n->count = run_node(*it).v_int;
+          n->count = Interpreter::get_instance()->run_node(*it).v_int;
           
           p->next = n;
           p = n;
@@ -441,7 +441,7 @@ private:
 
   void enter_var_stmt(Node* node) {
     if( node->is_make_array ) {
-      var_stmt_list.emplace_front(node->arr_depth_list);
+      var_stmt_list.push_front(std::unique_ptr<ElemCount>(ElemCount::create(node->arr_depth_list)));
     }
     else {
       var_stmt_list.emplace_front();
