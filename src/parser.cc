@@ -90,7 +90,6 @@ Node* Parser::expect_type() {
     }
     else {
       node->arr_depth_list.emplace_back(expr());
-      alert;
       expect("]");
     }
   }
@@ -360,7 +359,6 @@ Node* Parser::expr() {
       error(ERR_TYPE, node->token, "cannot infer a type of variable");
     }
     
-    alert;
     return node;
   }
 
@@ -408,7 +406,6 @@ Node* Parser::top() {
     node->expr = expr();
 
     if( is_main ) {
-      alert;
       node->expr->list.emplace_back(new Node(NODE_VALUE))->obj.type = OBJ_INT;
     }
 
