@@ -45,6 +45,9 @@ void Evaluater::check_array(
     else { // it is array, and empty
       alert;
       array->elemcount = &(cur_var_s->objects.emplace_back());
+
+      alert;
+      assert(array->elemcount != nullptr);
     }
   }
 
@@ -210,10 +213,21 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
     
     case NODE_ARRAY: {
-      
       if( node->is_allowed_empty_array ) {
+        alert;
+      #if __DEBUG__
+        error(ERR_NOTE, node->token, "");
+      #endif
+
         if( node->list.empty() ) {
-          return node->objtype;
+          
+          alert;
+          fprintf(stderr,"%d\n",node->objtype.arr_depth);
+
+          if( node->objtype.arr_depth >= 1 ) {
+            alert;
+            exit(1);
+          }
         }
         
         for( auto&& i : node->list ) {
@@ -414,8 +428,23 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
 
         if( node->type && specified_type.arr_depth ) {
-          node->is_make_array = true;
-          check_array(specified_type.arr_depth, node->list, node->type->elemcount_list.cbegin(), node->expr);
+          //node->is_make_array = true;
+          //check_array(specified_type.arr_depth, node->list, node->type->elemcount_list.cbegin(), node->expr);
+
+          auto flag = false;
+          for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
+            if( *it != nullptr ) {
+              if( !flag ) {
+                flag = true;
+              }
+              else {
+                error(ERR_TYPE, (*it)->token, "error(TODO: write this message)");
+                var_stmt_list.pop_front();
+                return { };
+              }
+            }
+          }
+
         }
       }
 

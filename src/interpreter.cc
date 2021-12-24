@@ -42,6 +42,10 @@ void Interpreter::div(Object& obj, Object& item) {
   }
 }
 
+Object Interpreter::construct_array(Node* node) {
+  
+}
+
 Object& Interpreter::run_lvalue(Node* node) {
 #if __DEBUG__
   assert(node != nullptr);
@@ -54,7 +58,9 @@ Object& Interpreter::run_lvalue(Node* node) {
   }
 
   alert;
-  abort();
+  error(ERR_TYPE, node->token,
+    "omg this is not a lvalue, but why you can see this error?"
+    PLEASE_REPORT "$9oGb83NNmwx");
 }
 
 Object Interpreter::run_node(Node* node) {

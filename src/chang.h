@@ -16,6 +16,8 @@
 
 #define  __DEBUG__  1
 
+#define  PLEASE_REPORT  "please report to developer with your script file and this code: "
+
 #if __DEBUG__
   #define alert fprintf(stderr,"\t#alert at %s:%d\n",__FILE__,__LINE__)
   #define debug(...) __VA_ARGS__
@@ -406,6 +408,8 @@ public:
 
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
+
+  Object construct_array(Node* node);
 
   static Interpreter* get_instance();
 
