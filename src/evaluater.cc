@@ -43,7 +43,8 @@ void Evaluater::check_array(
       error(ERR_TYPE, array->token, "array is must empty");
     }
     else { // it is array, and empty
-      array->elemcount = &cur_var_s->objects.emplace_back();
+      alert;
+      array->elemcount = &(cur_var_s->objects.emplace_back());
     }
   }
 

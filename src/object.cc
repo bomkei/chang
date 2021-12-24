@@ -50,6 +50,17 @@ std::string ObjectType::to_string() const {
 }
 
 std::string Object::to_string() const {
+  if( type.arr_depth ) {
+    std::string str = "[";
+
+    for( std::size_t i = 0; i < list.size(); i++ ) {
+      str += list[i].to_string();
+      if( i < list.size() - 1 ) str += ", ";
+    }
+
+    return str + "]";
+  }
+
   switch( type.kind ) {
     case OBJ_INT:
       return std::to_string(v_int);

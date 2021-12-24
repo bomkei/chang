@@ -75,13 +75,24 @@ Object Interpreter::run_node(Node* node) {
       obj.type = node->objtype;
 
       if( node->is_allowed_empty_array ) {
-        
+        alert;
+
+        auto item = obj;
+        item.type.arr_depth--;
+
+        for( std::size_t i = 0; i < node->elemcount->v_int; i++ ) {
+          obj.list.emplace_back(item);
+        }
       }
       else {
+        alert;
 
+        for( auto&& i : node->list ) {
+          obj.list.emplace_back(run_node(i));
+        }
       }
 
-      break;
+      return obj;
     }
 
     case NODE_CALLFUNC: {
@@ -118,8 +129,9 @@ Object Interpreter::run_node(Node* node) {
 
       auto ec_it = node->objects.begin();
 
-      for( auto&& ec : node->elemcount_list ) {
+      for( auto&& ec : node->type->elemcount_list ) {
         if( ec != nullptr ) {
+          alert;
           *ec_it++ = run_node(ec);
           //ec_it++;
         }
