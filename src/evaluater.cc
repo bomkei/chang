@@ -350,7 +350,7 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       auto [scope, index] = find_var(node->name);
 
-      if( scope ) {
+      if( scope == *scope_list.begin() ) {
         error(ERR_MULTIPLE_DEFINED, node->token, "multiple defined variable name");
         exit(1);
       }
@@ -389,7 +389,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
 
         if( node->type && specified_type.arr_depth ) {
-
+          node->is_make_array = true;
           check_array(specified_type.arr_depth, node->type->arr_depth_list.cbegin(), node->expr);
         }
       }

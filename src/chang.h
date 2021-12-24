@@ -283,6 +283,7 @@ struct Node {
   Node* var_scope;
   long var_index = -1;
 
+  bool is_make_array = false;
   std::vector<Node*> arr_depth_list;
 
   // if self is NODE_VAR, this is can use to check if placed self on allowed area.
@@ -404,7 +405,54 @@ public:
   static void div(Object& obj, Object& val);
 
 private:
+  struct ElemCount {
+    std::size_t count = 0;
+    ElemCount* next = nullptr;
 
+    static ElemCount* create(std::vector<Node*> const& list) {
+      auto ec = new ElemCount;
+      auto p = ec;
+
+      for( auto it = list.begin(); it != list.end(); it++ ) {
+        if( it == list.first() ) {
+          ec->count = run_node(*it).v_int;
+        }
+        else {
+          auto n = new ElemCount;
+          n->count = run_node(*it).v_int;
+          
+          p->next = n;
+          p = n;
+        }
+      }
+      
+      return ec;
+    }
+
+    ~ElemCount() {
+      if( next ) delete next;
+    }
+
+  private:
+    ElemCount() = default;
+    ElemCount(ElemCount&&) = delete;
+    ElemCount(ElemCount const&) = delete;
+  };
+
+  void enter_var_stmt(Node* node) {
+    if( node->is_make_array ) {
+      var_stmt_list.emplace_front(node->arr_depth_list);
+    }
+    else {
+      var_stmt_list.emplace_front();
+    }
+  }
+
+  void leave_var_stmt() {
+    var_stmt_list.pop_front();
+  }
+
+  std::list<std::unique_ptr<ElemCount>> var_stmt_list;
 };
 
 struct BuiltinFunc {
