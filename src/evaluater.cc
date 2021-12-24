@@ -23,13 +23,8 @@ bool Evaluater::is_branchable(Node* node) {
 }
 
 void Evaluater::check_array(long depth, typename std::vector<Node*>::const_iterator it, Node* array) {
-  alert;
-
   if( depth == 0 )
     return;
-
-  alert;
-  error(ERR_NOTE, (*it)->token, "");
 
   if( *it != nullptr ) {
     if( array->kind != NODE_ARRAY ) {
@@ -116,9 +111,6 @@ std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
 ObjectType Evaluater::must_integrated(Node* node) {
   assert(node->kind == NODE_SCOPE);
 
-  //if( node->list.size() <= 1 )
-  //  return { };
-  
   auto types = get_return_values(node);
 
   if( types.empty() )
@@ -146,12 +138,6 @@ ObjectType Evaluater::must_integrated(Node* node) {
 
 std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
   for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
-#if __DEBUG__
-    alert;
-    fprintf(stderr,"*it = %p\n",*it);
-    fprintf(stderr,"(*it)->object.size() = %lu\n",(*it)->objects.size());
-#endif
-
     auto find = (*it)->find_var(name);
 
     if( find != -1 ) {
@@ -377,17 +363,14 @@ ObjectType Evaluater::evaluate(Node* node) {
         if( node->type ) {
           if( !expr_type.equals(specified_type) ) {
             error(ERR_TYPE, node->token, "type mismatch");
+            break;
           }
         }
         else {
           obj.type = expr_type;
         }
 
-        alert;
-        fprintf(stderr,"%p  %lu\n",node->type,specified_type.arr_depth);
-
         if( node->type && specified_type.arr_depth ) {
-          alert;
           check_array(specified_type.arr_depth, node->type->arr_depth_list.cbegin(), node->expr);
         }
       }

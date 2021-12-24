@@ -2,9 +2,12 @@
 
 bool ObjectType::equals(ObjectType const& type) const {
   if( kind == type.kind ) {
-    // todo
-    
-    return true;
+    if( kind == OBJ_TUPLE ) {
+      // todo
+    }
+
+    if( arr_depth == type.arr_depth )
+      return true;
   }
 
   return false;

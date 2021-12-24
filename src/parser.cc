@@ -117,6 +117,7 @@ Node* Parser::primary() {
 
   if( consume("[") ) {
     auto x = new Node(NODE_ARRAY);
+    x->token = consumed;
 
     if( consume("]") ) {
       error(ERR_SYNTAX, consumed, "empty array is invalid due to cannot infer a type");
@@ -339,8 +340,6 @@ Node* Parser::add() {
 
 Node* Parser::expr() {
   if( consume("var") ) {
-    alert;
-    
     auto node = new Node(NODE_VAR);
     node->token = consumed;
 
