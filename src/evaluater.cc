@@ -271,17 +271,6 @@ ObjectType Evaluater::evaluate(Node* node) {
         error(ERR_NOTE, node->type->token, "specified here");
       }
 
-#if __DEBUG__
-      std::vector<ObjectType> v;
-
-      for( auto&& i : get_return_values(node->expr) ) {
-        v.emplace_back(evaluate(i));
-      }
-
-      std::cout << v << std::endl;
-
-#endif
-
       break;
     }
 
@@ -342,6 +331,10 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
         else {
           obj.type = expr_t;
+        }
+
+        if( node->type && !node->type->arr_depth_list.empty() ) {
+          
         }
       }
 

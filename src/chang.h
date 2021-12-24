@@ -195,6 +195,10 @@ enum NodeKind {
 
   NODE_VALUE,
   NODE_VARIABLE,
+
+  NODE_ARRAY,
+  NODE_INDEX_REF,
+  
   NODE_MEMBER_ACCESS,
 
   // argument
@@ -279,7 +283,7 @@ struct Node {
   Node* var_scope;
   long var_index = -1;
 
-  std::size_t arr_depth = 0;
+  std::vector<Node*> arr_depth_list;
 
   // if self is NODE_VAR, this is can use to check if placed self on allowed area.
   // example for, root in scope.

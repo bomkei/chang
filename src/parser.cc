@@ -84,8 +84,14 @@ Node* Parser::expect_type() {
     expect(">");
   }
 
-  while( consume("[]") ) {
-    node->arr_depth++;
+  while( consume("[") ) {
+    if( consume("]") ) {
+      node->arr_depth_list.emplace_back(nullptr);
+    }
+    else {
+      node->arr_depth_list.emplace_back(expr());
+      expect("]");
+    }
   }
 
   return node;
@@ -106,6 +112,22 @@ Node* Parser::primary() {
     auto e = expr();
     expect(")");
     return e;
+  }
+
+  if( consume("[") ) {
+    auto x = new Node(NODE_ARRAY);
+
+    if( consume("]") ) {
+      error(ERR_SYNTAX, consumed, "empty array is invalid due to cannot infer a type of it");
+      return nullptr;
+    }
+
+    do {
+      x->list.emplace_back(expr());
+    } while( consume(",") );
+
+    expect("]");
+    return x;
   }
 
   if( consume("{") ) {
