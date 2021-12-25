@@ -271,7 +271,7 @@ ObjectType Evaluater::evaluate(Node* node) {
       Node* fn;
 
       for( auto&& i : node->list ) {
-        evaluate(i);
+        args.emplace_back(evaluate(i));
       }
 
       for( auto&& i : builtin ) {
@@ -369,6 +369,13 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_FUNCTION: {
+      for( auto&& arg : node->list ) {
+        auto& obj = node->expr->objects.emplace_back();
+
+        obj.type = evaluate(arg->type);
+        obj.name = arg->name;
+      }
+
       auto func_type = evaluate(node->type);
       auto eval = evaluate(node->expr);
 

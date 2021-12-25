@@ -107,10 +107,29 @@ Object Interpreter::run_node(Node* node) {
 
     case NODE_CALLFUNC: {
       std::vector<Object> args;
+      std::vector<Object> save;
+
+      for( auto&& i : node->list ) {
+        args.emplace_back(run_node(i));
+      }
 
       if( node->builtin ) {
-
+        return node->builtin->func(args);
       }
+
+      const auto argc = node->func->list.size();
+      for( std::size_t i = 0; i < argc; i++ ) {
+        save.emplace_back(node->func->expr->objects[i]);
+        node->func->expr->objects[i] = args[i];
+      }
+
+      auto obj = run_node(node->func->expr);
+
+      for( std::size_t i = 0; i < argc; i++ ) {
+        node->func->expr->objects[i] = save[i];
+      }
+
+      return obj;
     }
 
     case NODE_ARRAY: {
@@ -129,20 +148,6 @@ Object Interpreter::run_node(Node* node) {
       }
 
       return obj;
-    }
-
-    case NODE_CALLFUNC: {
-      std::vector<Object> args;
-
-      for( auto&& i : node->list ) {
-        args.emplace_back(run_node(i));
-      }
-
-      if( node->builtin ) {
-        return node->builtin->func(args);
-      }
-
-      break;
     }
 
     case NODE_SCOPE: {
