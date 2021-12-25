@@ -168,6 +168,7 @@ struct ObjectType {
   ObjectKind kind;
   std::vector<ObjectType> elems;
   std::size_t arr_depth = 0;
+  bool reference = false;
   
   ObjectType(ObjectKind kind = OBJ_NONE)
     : kind(kind) {

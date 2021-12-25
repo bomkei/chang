@@ -65,7 +65,7 @@ Node* Parser::expect_argument() {
 Node* Parser::expect_type() {
   Node* node = new Node(NODE_TYPE);
 
-  if( consume("ref") ) {
+  if( consume("&") ) {
     node->is_reference = true;
   }
 
@@ -170,7 +170,7 @@ Node* Parser::primary() {
       expect("}");
 
       if( is_need_semicolon(item) ) {
-        error(ERR_EXPECTED, consumed, "expected ';' , because previous statement is can't be return value.");
+        error(ERR_EXPECTED, consumed, "expected ';', because previous statement is can't be return value.");
       }
 
       break;
