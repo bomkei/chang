@@ -11,10 +11,8 @@ long Node::find_var(std::string_view const& name) {
 
 Node::Node(NodeKind kind)
   : kind(kind) {
-
 }
 
 Node::Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok)
   : kind(kind), lhs(lhs), rhs(rhs), token(tok) {
-
 }

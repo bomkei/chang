@@ -144,8 +144,8 @@ ObjectType Evaluater::must_integrated(Node* node) {
     auto&& eval = evaluate(*it);
 
     if( !first.equals(eval) ) {
-      error(ERR_TYPE, node->token, "all types of return value is not integrated.");
-      error(ERR_NOTE, types[0]->token, "was inferred as '%s' here", firststr.c_str());
+      error(ERR_TYPE, node->token, "all values which can be return value of scope are must be integrated by one type.");
+      error(ERR_NOTE, types[0]->token, "return type was inferred as '%s' here", firststr.c_str());
       error(ERR_TYPE, (*it)->token, "expected '%s', but found '%s'", firststr.c_str(), eval.to_string().c_str());
       exit(1);
     }
@@ -210,12 +210,6 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_ARRAY: {
       if( node->is_allowed_empty_array ) {
         if( node->list.empty() ) {
-          /*if( node->objtype.arr_depth >= 1 ) {
-            //alert;
-            //exit(1);
-            
-          }*/
-
           return node->objtype;
         }
         
@@ -326,12 +320,11 @@ ObjectType Evaluater::evaluate(Node* node) {
 
         if( !func_type.equals(e) ) {
           if( !err ) {
-            std::cout << Global::get_instance()->file_path << ": in function '" << node->name << "'" << std::endl;
+            std::cout << Global::get_instance()->file_path << ": In function '" << node->name << "'" << std::endl;
             err = true;
           }
 
-          error(ERR_TYPE, i->token, "expected '%s' , but found '%s'", func_type.to_string().c_str(), e.to_string().c_str());
-          break;
+          error(ERR_TYPE, i->token, "expected '%s', but found '%s'", func_type.to_string().c_str(), e.to_string().c_str());
         }
       }
 
@@ -399,10 +392,6 @@ ObjectType Evaluater::evaluate(Node* node) {
           auto flag = false;
           
           node->is_make_array = true;
-
-          // if( node->expr ) {
-          //   node->expr->is_allowed_empty_array = true;
-          // }
 
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
             if( *it == nullptr ) {

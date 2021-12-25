@@ -65,6 +65,10 @@ Node* Parser::expect_argument() {
 Node* Parser::expect_type() {
   Node* node = new Node(NODE_TYPE);
 
+  if( consume("ref") ) {
+    node->is_reference = true;
+  }
+
   expect_ident();
   node->token = token;
   node->name = token->str;
@@ -287,8 +291,29 @@ Node* Parser::member() {
   return node;
 }
 
+Node* Parser::unary() {
+  if( consume("-") ) {
+    auto x = new Node(NODE_EXPR);
+
+    (x->expr = new Node(NODE_VALUE))->obj.type.kind = OBJ_INT;
+    x->expr_list.emplace_back(Node::ExprPair{ EXPR_SUB, consumed, member() });
+
+    return x;
+  }
+
+  if( consume("&") ) {
+    auto x = new Node(NODE_GET_ADDR);
+
+    x->expr = member();
+
+    return x;
+  }
+
+  return member();
+}
+
 Node* Parser::mul() {
-  auto node = member();
+  auto node = unary();
 
   if( token->str == "*" || token->str == "/" ) {
     auto expr = new Node(NODE_EXPR);
@@ -305,7 +330,7 @@ Node* Parser::mul() {
       else
         break;
 
-      expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, member() });
+      expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, unary() });
     }
 
     return expr;
@@ -363,6 +388,15 @@ Node* Parser::expr() {
       error(ERR_TYPE, node->token, "cannot infer a type of variable");
     }
     
+    return node;
+  }
+
+  if( consume("return") ) {
+    auto node = new Node(NODE_RETURN);
+
+    node->token = consumed;
+    node->expr = expr();
+
     return node;
   }
 

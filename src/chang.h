@@ -186,6 +186,7 @@ struct Object {
     char16_t v_char;
     double v_float;
     bool v_bool;
+    Object* address;
   };
 
   std::u16string v_str;
@@ -216,6 +217,7 @@ enum NodeKind {
   NODE_ARRAY,
   NODE_INDEX_REF,
 
+  NODE_GET_ADDR,
   NODE_MEMBER_ACCESS,
 
   // argument
@@ -239,6 +241,9 @@ enum NodeKind {
 
   // if statement
   NODE_IF,
+
+  // return
+  NODE_RETURN,
 
   // scope
   //   list = elements
@@ -293,6 +298,7 @@ struct Node {
   Node* if_true;
   Node* if_else;
 
+  bool is_reference = false;
   bool evaluated = false;
   ObjectType objtype;
 
@@ -352,6 +358,7 @@ public:
 
   Node* primary();
   Node* member();
+  Node* unary();
   Node* mul();
   Node* add();
   Node* expr();
