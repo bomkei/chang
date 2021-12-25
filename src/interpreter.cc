@@ -135,25 +135,25 @@ Object Interpreter::run_node(Node* node) {
     }
   
     case NODE_VAR: {
-      // if( node->is_make_array ) {
-      //   for( std::size_t i = 0; i < node->elemcount_list.size(); i++ ) {
-      //     node->objects[i] = run_node(node->elemcount_list[i]);
-      //   }
-      // }
-
       var_stmt_list.push_front(node);
 
-      auto ec_it = node->objects.begin();
+      if( node->is_make_array ) {
+        auto ec_it = node->objects.begin();
 
-      for( auto&& ec : node->type->elemcount_list ) {
-        if( ec != nullptr ) {
-          *ec_it++ = run_node(ec);
+        for( auto&& ec : node->type->elemcount_list ) {
+          if( ec != nullptr ) {
+            *ec_it++ = run_node(ec);
+          }
         }
       }
 
+      if( !node->expr ) {
+        node->get_var() = construct_array(node->type->objtype, node->objects.end(), node->objects.begin());
+      }
+      else {
+        node->get_var() = run_node(node->expr);
+      }
 
-      node->get_var() = run_node(node->expr);
-      
       var_stmt_list.pop_front();
       break;
     }

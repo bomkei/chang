@@ -395,18 +395,8 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       if( node->type ) {
         obj.type = specified_type;
-      }
 
-      // have initializer expr
-      if( node->expr ) {
         if( specified_type.arr_depth ) {
-          node->expr->is_allowed_empty_array = true;
-          (node->expr->objtype = specified_type).arr_depth = 1;
-        }
-
-        auto expr_type = evaluate(node->expr);
-
-        if( node->type && specified_type.arr_depth ) {
           auto flag = false;
 
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
@@ -424,18 +414,28 @@ ObjectType Evaluater::evaluate(Node* node) {
             node->objects.emplace_back();
           }
 
-          check_array(node->type->elemcount_list.begin(), node->objects.begin(), specified_type.arr_depth, node->expr);
-        }
-        else if( node->type ) {
-          // not matching types which specify and initializer
-          if( !expr_type.equals(specified_type) ) {
-            std::cout << specified_type << ", " << expr_type << std::endl;
-            error(ERR_TYPE, node->token, "type mismatch");
+          if( node->type->elemcount_list[0] ) {
+            if( !node->expr ) {
+              node->expr = new Node(NODE_ARRAY);
+            }
+            
+            node->expr->evaluated = true;
+            node->expr->is_allowed_empty_array = true;
+            (node->expr->objtype = specified_type).arr_depth = 1;
+
+            check_array(node->type->elemcount_list.begin(), node->objects.begin(), specified_type.arr_depth, node->expr);
+
+            var_stmt_list.pop_front();
+            break;
           }
         }
-        else {
-          obj.type = expr_type;
+
+        if( !evaluate(node->expr).equals(specified_type) ) {
+          error(ERR_TYPE, node->token, "type mismatch");
         }
+      }
+      else {
+        obj.type = evaluate(node->expr);
       }
 
       var_stmt_list.pop_front();
