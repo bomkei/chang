@@ -61,8 +61,6 @@ int Driver::main(int argc, char** argv) {
   if( global.is_error_occurred )
     return 0;
 
-  return 0;
-
   Interpreter runner;
   
   alert;

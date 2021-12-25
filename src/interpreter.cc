@@ -42,6 +42,22 @@ void Interpreter::div(Object& obj, Object& item) {
   }
 }
 
+Object Interpreter::construct_array(ObjectType type, Interpreter::EcObjIt end, Interpreter::EcObjIt it) {
+  Object obj;
+  obj.type = type;
+
+  if( it == end ) {
+    return obj;
+  }
+
+  type.arr_depth -= 1;
+  for( long i = 0; i < it->v_int; i++ ) {
+    obj.list.emplace_back(construct_array(type, end, it + 1));
+  }
+
+  return obj;
+}
+
 void Interpreter::fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr) {
   
 
@@ -71,7 +87,6 @@ Object Interpreter::run_node(Node* node) {
   
   switch( node->kind ) {
     case NODE_VALUE:
-      alert;
       return node->obj;
 
     case NODE_VARIABLE:
@@ -83,20 +98,10 @@ Object Interpreter::run_node(Node* node) {
       obj.type = node->objtype;
 
       if( node->is_allowed_empty_array ) {
-        alert;
-
-        //auto item = obj;
-        //item.type.arr_depth--;
-        auto item_type = obj.type;
-        item_type.arr_depth -= 1;
-
-        for( std::size_t i = 0; i < node->elemcount->v_int; i++ ) {
-          obj.list.emplace_back(Object::construct_from_type(item_type));
-        }
+        auto var_s = *var_stmt_list.begin();
+        return construct_array(node->objtype, var_s->objects.end(), var_s->objects.begin());
       }
       else {
-        alert;
-
         for( auto&& i : node->list ) {
           obj.list.emplace_back(run_node(i));
         }
@@ -123,7 +128,6 @@ Object Interpreter::run_node(Node* node) {
       Object obj;
 
       for( auto&& item : node->list ) {
-        alert;
         obj = run_node(item);
       }
 
@@ -137,18 +141,20 @@ Object Interpreter::run_node(Node* node) {
       //   }
       // }
 
+      var_stmt_list.push_front(node);
+
       auto ec_it = node->objects.begin();
 
       for( auto&& ec : node->type->elemcount_list ) {
         if( ec != nullptr ) {
-          alert;
           *ec_it++ = run_node(ec);
-          //ec_it++;
         }
       }
 
+
       node->get_var() = run_node(node->expr);
       
+      var_stmt_list.pop_front();
       break;
     }
 

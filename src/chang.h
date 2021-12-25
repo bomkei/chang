@@ -301,7 +301,7 @@ struct Node {
   long var_index = -1;
 
   bool is_make_array = false;
-  Object* elemcount;
+  Object const* elemcount;
   std::vector<Node*> elemcount_list;
 
   // if self is NODE_VAR, this is can use to check if placed self on allowed area.
@@ -387,7 +387,7 @@ private:
   bool is_branchable(Node* node);
 
   // check array
-  void check_array(std::vector<Node*>::const_iterator ec_list_it, std::size_t depth, Node* arr);
+  void check_array(std::vector<Node*>::const_iterator ec_list_it, std::vector<Object>::const_iterator ec_obj_list_it, std::size_t depth, Node* arr);
 
   //  get all nodes which can be return value
   std::vector<Node*> get_return_values(Node* node);
@@ -410,13 +410,15 @@ private:
 };
 
 class Interpreter {
+  using EcObjIt = std::vector<Object>::const_iterator;
+
 public:
   Interpreter();
 
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
 
-  //Object construct_array(Node* node);
+  Object construct_array(ObjectType type, EcObjIt end, EcObjIt it);
   void fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr);
 
   static Interpreter* get_instance();
@@ -427,65 +429,8 @@ public:
   static void div(Object& obj, Object& val);
 
 private:
-  /*
-  struct ElemCount {
-    std::size_t count = 0;
-    ElemCount* next = nullptr;
-    bool null = false;
 
-    static ElemCount* create(std::vector<Node*> const& list) {
-      auto ec = new ElemCount;
-      auto p = ec;
-
-      for( auto it = list.begin(); it != list.end(); it++ ) {
-        std::size_t count = Interpreter::get_instance()->run_node(*it).v_int;
-        
-        if( it != list.begin() ) {
-          auto n = new ElemCount;
-          
-          p->next = n;
-          p = n;
-        }
-
-        if( *it == nullptr ) {
-          p->null = true;
-        }
-        else {
-          p->count = count;
-        }
-      }
-      
-      return ec;
-    }
-
-    ~ElemCount() {
-      fprintf(stderr,"~ElemCount()  %p\n",this);
-    }
-
-  private:
-    ElemCount() {
-      fprintf(stderr,"ElemCount()   %p\n",this);
-    }
-
-    ElemCount(ElemCount&&) = delete;
-    ElemCount(ElemCount const&) = delete;
-  };
-
-  void enter_var_stmt(Node* node) {
-    if( node->is_make_array ) {
-      var_stmt_list.push_front(std::unique_ptr<ElemCount>(ElemCount::create(node->elemcount_list)));
-    }
-    else {
-      var_stmt_list.emplace_front();
-    }
-  }
-
-  void leave_var_stmt() {
-    var_stmt_list.pop_front();
-  }
-
-  std::list<std::unique_ptr<ElemCount>> var_stmt_list;
-  */
+  std::list<Node*> var_stmt_list;
 };
 
 struct BuiltinFunc {
