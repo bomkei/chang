@@ -32,52 +32,28 @@ void Evaluater::check_array(std::vector<Node*>::const_iterator ec_list_it, std::
 
   if( *ec_list_it != nullptr ) {
     if( arr->kind != NODE_ARRAY ) {
-      error(ERR_TYPE, arr->token, "err aaaa");
+      error(ERR_TYPE, arr->token, "expected empty array");
       return;
     }
     else if( !arr->list.empty() ) {
-      error(ERR_TYPE, arr->token, "err jiojio");
+      error(ERR_TYPE, arr->token, "array must be empty");
       return;
     }
 
-    
+    arr->objtype.arr_depth = depth;
+    return;
+  }
+
+  if( arr_type.arr_depth != depth ) {
+    error(ERR_TYPE, arr->token, "type mismatch");
+  }
+
+  if( depth >= 2 && arr->kind == NODE_ARRAY ) {
+    for( auto&& i : arr->list ) {
+      check_array(ec_list_it + 1, depth - 1, i);
+    }
   }
 }
-
-/*
-void Evaluater::check_array(
-  long depth,
-  std::vector<Node*>& uninitialized_list,
-  typename std::vector<Node*>::const_iterator elemcount_it,
-  Node* array
-  ) {
-  auto cur_var_s = *var_stmt_list.begin();
-
-  if( depth == 0 )
-    return;
-
-  if( *elemcount_it != nullptr ) {
-    assert(array->is_allowed_empty_array);
-
-    if( array->kind != NODE_ARRAY ) {
-      error(ERR_TYPE, array->token, "expected empty array");
-    }
-    else if( !array->list.empty() ) {
-      error(ERR_TYPE, array->token, "array is must empty");
-    }
-    else { // it is array, and empty
-      alert;
-      array->elemcount = &(cur_var_s->objects.emplace_back());
-
-      alert;
-      assert(array->elemcount != nullptr);
-    }
-  }
-
-  for( auto&& i : array->list ) {
-    check_array(depth - 1, uninitialized_list, elemcount_it + 1, i);
-  }
-}*/
 
 std::vector<Node*> Evaluater::get_return_values(Node* node) {
   using Vec = std::vector<Node*>;
@@ -237,16 +213,7 @@ ObjectType Evaluater::evaluate(Node* node) {
     
     case NODE_ARRAY: {
       if( node->is_allowed_empty_array ) {
-        alert;
-      #if __DEBUG__
-        error(ERR_NOTE, node->token, "");
-      #endif
-
         if( node->list.empty() ) {
-          
-          alert;
-          fprintf(stderr,"%d\n",node->objtype.arr_depth);
-
           if( node->objtype.arr_depth >= 1 ) {
             alert;
             exit(1);
@@ -451,24 +418,21 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
 
         if( node->type && specified_type.arr_depth ) {
-          //node->is_make_array = true;
-          //check_array(specified_type.arr_depth, node->list, node->type->elemcount_list.cbegin(), node->expr);
-
           auto flag = false;
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
-            if( *it != nullptr ) {
+            if( *it == nullptr ) {
               if( !flag ) {
                 flag = true;
               }
-              else {
-                error(ERR_TYPE, (*it)->token, "error(TODO: write this message)");
-                var_stmt_list.pop_front();
-                return { };
-              }
+            }
+            else if( flag ) {
+              error(ERR_TYPE, (*it)->token, "cannot specify elements count of array in this depth, due to not specified previous depth.");
+              error(ERR_NOTE, (*(it - 1))->token, "due to elements will be empty, and then count specific on next is invalid.");
+              return { };
             }
           }
 
-          check_array(node->type->elemcount_list, specified_type.arr_depth, node->expr);
+          check_array(node->type->elemcount_list.begin(), specified_type.arr_depth, node->expr);
 
         }
       }

@@ -85,11 +85,13 @@ Object Interpreter::run_node(Node* node) {
       if( node->is_allowed_empty_array ) {
         alert;
 
-        auto item = obj;
-        item.type.arr_depth--;
+        //auto item = obj;
+        //item.type.arr_depth--;
+        auto item_type = obj.type;
+        item_type.arr_depth -= 1;
 
         for( std::size_t i = 0; i < node->elemcount->v_int; i++ ) {
-          obj.list.emplace_back(item);
+          obj.list.emplace_back(Object::construct_from_type(item_type));
         }
       }
       else {
