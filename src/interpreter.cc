@@ -48,23 +48,24 @@ Object Interpreter::construct_array(ObjectType type, Interpreter::EcObjIt end, I
   obj.type.arr_depth = 1;
 
   Object elem;
-  elem.type = OBJ_INT;
+  elem.type = type;
+  elem.type.arr_depth = 0;
 
   while( true ) {
     for( long i = 0; i < it->v_int; i++ ) {
       obj.list.emplace_back(elem);
     }
 
-    alert;
-    std::cout << obj << std::endl;
+    if( it->v_int == 0 && elem.type.arr_depth ) {
+      obj.list.emplace_back(elem);
+    }
 
     if( ++it == end )
       break;
 
     elem = obj;
     obj.type.arr_depth++;
-    //obj.list.clear();
-
+    obj.list.clear();
   }
 
   return obj;

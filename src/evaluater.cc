@@ -226,6 +226,7 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
       else if( node->list.empty() ) {
         error(ERR_TYPE, node->token, "empty array is invalid");
+        exit(1);
       }
 
       auto first = evaluate(node->list[0]);
@@ -399,9 +400,9 @@ ObjectType Evaluater::evaluate(Node* node) {
           
           node->is_make_array = true;
 
-          if( node->expr ) {
-            node->expr->is_allowed_empty_array = true;
-          }
+          // if( node->expr ) {
+          //   node->expr->is_allowed_empty_array = true;
+          // }
 
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
             if( *it == nullptr ) {
@@ -419,12 +420,8 @@ ObjectType Evaluater::evaluate(Node* node) {
           }
 
           if( node->type->elemcount_list[0] ) {
-            // if( !node->expr ) {
-            //   node->expr = new Node(NODE_ARRAY);
-            // }
-            
-
             if( node->expr ) {
+              node->expr->is_allowed_empty_array = true;
               (node->expr->objtype = specified_type).arr_depth = 1;
               check_array(node->type->elemcount_list.begin(), node->objects.begin(), specified_type.arr_depth, node->expr);
             }

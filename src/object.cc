@@ -75,6 +75,10 @@ std::string Object::to_string() const {
       return v_bool ? "true" : "false";
 
     case OBJ_STRING:
+      if( v_str.empty() ) {
+        return "\"\"";
+      }
+
       return Utils::String::to_utf8(v_str);
 
     case OBJ_NONE:
