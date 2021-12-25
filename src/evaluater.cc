@@ -23,9 +23,6 @@ bool Evaluater::is_branchable(Node* node) {
 }
 
 void Evaluater::check_array(std::vector<Node*>::const_iterator ec_list_it, std::vector<Object>::const_iterator ec_obj_list_it, std::size_t depth, Node* arr) {
-  assert(arr->is_allowed_empty_array);
-  assert(arr->evaluated);
-
   auto arr_type = evaluate(arr);
   arr->elemcount = &*ec_obj_list_it;
 
@@ -394,10 +391,17 @@ ObjectType Evaluater::evaluate(Node* node) {
       auto specified_type = evaluate(node->type);
 
       if( node->type ) {
+        auto chk_type = node->expr != nullptr;
         obj.type = specified_type;
 
         if( specified_type.arr_depth ) {
           auto flag = false;
+          
+          node->is_make_array = true;
+
+          if( node->expr ) {
+            node->expr->is_allowed_empty_array = true;
+          }
 
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
             if( *it == nullptr ) {
@@ -415,22 +419,22 @@ ObjectType Evaluater::evaluate(Node* node) {
           }
 
           if( node->type->elemcount_list[0] ) {
-            if( !node->expr ) {
-              node->expr = new Node(NODE_ARRAY);
-            }
+            // if( !node->expr ) {
+            //   node->expr = new Node(NODE_ARRAY);
+            // }
             
-            node->expr->evaluated = true;
-            node->expr->is_allowed_empty_array = true;
-            (node->expr->objtype = specified_type).arr_depth = 1;
 
-            check_array(node->type->elemcount_list.begin(), node->objects.begin(), specified_type.arr_depth, node->expr);
+            if( node->expr ) {
+              (node->expr->objtype = specified_type).arr_depth = 1;
+              check_array(node->type->elemcount_list.begin(), node->objects.begin(), specified_type.arr_depth, node->expr);
+            }
 
             var_stmt_list.pop_front();
             break;
           }
         }
 
-        if( !evaluate(node->expr).equals(specified_type) ) {
+        if( chk_type && !evaluate(node->expr).equals(specified_type) ) {
           error(ERR_TYPE, node->token, "type mismatch");
         }
       }

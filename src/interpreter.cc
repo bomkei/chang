@@ -45,14 +45,26 @@ void Interpreter::div(Object& obj, Object& item) {
 Object Interpreter::construct_array(ObjectType type, Interpreter::EcObjIt end, Interpreter::EcObjIt it) {
   Object obj;
   obj.type = type;
+  obj.type.arr_depth = 1;
 
-  if( it == end ) {
-    return obj;
-  }
+  Object elem;
+  elem.type = OBJ_INT;
 
-  type.arr_depth -= 1;
-  for( long i = 0; i < it->v_int; i++ ) {
-    obj.list.emplace_back(construct_array(type, end, it + 1));
+  while( true ) {
+    for( long i = 0; i < it->v_int; i++ ) {
+      obj.list.emplace_back(elem);
+    }
+
+    alert;
+    std::cout << obj << std::endl;
+
+    if( ++it == end )
+      break;
+
+    elem = obj;
+    obj.type.arr_depth++;
+    //obj.list.clear();
+
   }
 
   return obj;
@@ -99,7 +111,7 @@ Object Interpreter::run_node(Node* node) {
 
       if( node->is_allowed_empty_array ) {
         auto var_s = *var_stmt_list.begin();
-        return construct_array(node->objtype, var_s->objects.end(), var_s->objects.begin());
+        return construct_array(node->objtype, var_s->objects.rend(), var_s->objects.rbegin());
       }
       else {
         for( auto&& i : node->list ) {
@@ -148,7 +160,7 @@ Object Interpreter::run_node(Node* node) {
       }
 
       if( !node->expr ) {
-        node->get_var() = construct_array(node->type->objtype, node->objects.end(), node->objects.begin());
+        node->get_var() = construct_array(node->type->objtype, node->objects.rend(), node->objects.rbegin());
       }
       else {
         node->get_var() = run_node(node->expr);

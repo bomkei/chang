@@ -410,7 +410,7 @@ private:
 };
 
 class Interpreter {
-  using EcObjIt = std::vector<Object>::const_iterator;
+  using EcObjIt = std::vector<Object>::const_reverse_iterator;
 
 public:
   Interpreter();
