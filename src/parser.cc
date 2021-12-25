@@ -252,12 +252,13 @@ Node* Parser::primary() {
     }
 
     case TOK_RESERVED: {
-      node->obj.type = OBJ_BOOL;
-
-      if( token->str == "true" )
-        node->obj.v_bool = true;
-      else if( token->str == "false" )
-        node->obj.v_bool = false;
+      if( token->str == "true" || token->str == "false" ) {
+        node->obj.type = OBJ_BOOL;
+        node->obj.v_bool = token->str == "true";
+      }
+      else if( token->str == "none" ) {
+        
+      }
       else
         goto unk;
       

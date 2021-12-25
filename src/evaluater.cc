@@ -166,16 +166,42 @@ std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) 
   return { nullptr, 0 };
 }
 
-Node* Evaluater::find_func(std::string_view const& name) {
+std::vector<ObjectType> Evaluater::eval_func_args(Node* func) {
+  std::vector<ObjectType> ret;
+
+  for( auto&& i : func->list ) {
+    ret.emplace_back(evaluate(i->type));
+  }
+
+  return ret;
+}
+
+std::vector<Node*> Evaluater::find_func(std::string_view const& name, std::vector<ObjectType> const& arg_types) {
+  std::vector<Node*> ret;
+
   for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
     for( auto&& i : (*it)->list ) {
-      if( i->kind == NODE_FUNCTION && i->name == name ) {
-        return i;
+      if( i && i->kind == NODE_FUNCTION && i->name == name ) {
+        auto args = eval_func_args(i);
+
+        if( args.size() != arg_types.size() ) {
+          continue;
+        }
+        else {
+          for( std::size_t i = 0; i < args.size(); i++ ) {
+            if( !args[i].equals(arg_types[i]) ) {
+              goto cnt_label;
+            }
+          }
+        }
+
+        ret.emplace_back(i);
+      cnt_label:;
       }
     }
   }
 
-  return nullptr;
+  return ret;
 }
 
 ObjectType Evaluater::evaluate(Node* node) {
@@ -240,6 +266,9 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       std::size_t argc;
       bool arg_free;
+      std::vector<ObjectType> args;
+      std::vector<Node*> find_userdef;
+      Node* fn;
 
       for( auto&& i : node->list ) {
         evaluate(i);
@@ -255,11 +284,42 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
       }
 
-      throw 0;
-      // todo: user defined
+      find_userdef = find_func(node->name, args);
+
+      if( find_userdef.empty() ) {
+        error(ERR_UNDEFINED, node->token, "undefined function");
+
+        for( auto&& scope : scope_list ) {
+          for( auto&& i : scope->list ) {
+            if( i && i->kind == NODE_FUNCTION && i->name == node->name )
+              find_userdef.emplace_back(i);
+          }
+        }
+
+        if( !find_userdef.empty() ) {
+          error(ERR_NOTE, node->token, "but found some function with same name, maybe did you tried call with wrong arguments?");
+
+          for( auto&& i : find_userdef ) {
+            error(ERR_NOTE, i->token, "got this");
+          }
+        }
+      }
+      else if( find_userdef.size() > 1 ) {
+        error(ERR_MANY_CANDIDATES, node->token, "found many candidates with this name");
+
+        for( auto&& i : find_userdef ) {
+          error(ERR_NOTE, i->token, "got this");
+        }
+      }
+
+      fn = find_userdef[0];
+
+      ret = evaluate(fn->expr);
+      node->func = fn;
+
+      break;
 
     check_process:;
-
       if( !arg_free ) {
         if( node->list.size() < argc ) {
           error(ERR_ARGUMENT, node->token, "too few argument");
@@ -315,6 +375,10 @@ ObjectType Evaluater::evaluate(Node* node) {
       auto list = get_return_values(node->expr);
       auto err = false;
 
+      if( list.empty() && !func_type.equals(OBJ_NONE) ) {
+        error(ERR_TYPE, node->token, "return type is not none, but function will return nothing.");
+      }
+
       for( auto&& i : list ) {
         auto&& e = evaluate(i);
 
@@ -329,7 +393,7 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       if( err ) {
-        error(ERR_NOTE, node->type->token, "specified here");
+        error(ERR_NOTE, node->type ? node->type->token : node->token, "specified here");
       }
 
       break;

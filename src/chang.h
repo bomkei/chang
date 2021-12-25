@@ -194,18 +194,6 @@ struct Object {
   std::vector<Object> list;
 
   std::string to_string() const;
-
-  static Object construct_from_type(ObjectType type) {
-    Object obj;
-    obj.type = type;
-
-    if( type.arr_depth ) {
-      type.arr_depth -= 1;
-      obj.list.emplace_back(construct_from_type(type));
-    }
-
-    return obj;
-  }
 };
 
 enum NodeKind {
@@ -295,6 +283,7 @@ struct Node {
   std::string_view name;
   Node* type;
   Node* expr;
+  Node* func;
 
   Node* if_true;
   Node* if_else;
@@ -411,7 +400,9 @@ private:
   ObjectType must_integrated(Node* node);
 
   std::pair<Node*, std::size_t> find_var(std::string_view const& name);
-  Node* find_func(std::string_view const& name);
+  
+  std::vector<ObjectType> eval_func_args(Node* func);
+  std::vector<Node*> find_func(std::string_view const& name, std::vector<ObjectType> const& arg_types);
 
   std::list<Node*> scope_list;
   std::list<Node*> var_stmt_list;
@@ -425,6 +416,8 @@ public:
 
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
+
+  
 
   Object construct_array(ObjectType type, EcObjIt end, EcObjIt it);
   void fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr);
@@ -464,6 +457,7 @@ enum ErrorKind {
   ERR_UNEXPECTED,
   ERR_UNDEFINED,
   ERR_MULTIPLE_DEFINED,
+  ERR_MANY_CANDIDATES,
   ERR_LOCATION,
   ERR_ARGUMENT,
   ERR_TYPE,

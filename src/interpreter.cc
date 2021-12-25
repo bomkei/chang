@@ -105,6 +105,14 @@ Object Interpreter::run_node(Node* node) {
     case NODE_VARIABLE:
       return run_lvalue(node);
 
+    case NODE_CALLFUNC: {
+      std::vector<Object> args;
+
+      if( node->builtin ) {
+
+      }
+    }
+
     case NODE_ARRAY: {
       Object obj;
 

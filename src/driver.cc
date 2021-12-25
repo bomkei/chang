@@ -48,15 +48,15 @@ int Driver::main(int argc, char** argv) {
   if( global.is_error_occurred )
     return 0;
 
-  if( !global.entry_point ) {
-    std::cout << "entry point function 'main' is not defined." << std::endl;
-    exit(1);
-  }
-
   Evaluater eval;
 
   alert;
   eval.evaluate(node);
+
+  if( !global.entry_point ) {
+    std::cout << "entry point function 'main' is not defined." << std::endl;
+    exit(1);
+  }
 
   if( global.is_error_occurred )
     return 0;
