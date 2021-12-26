@@ -95,6 +95,7 @@ Node* Parser::expect_type() {
   }
 
   if( consume("&") ) {
+    alert;
     node->is_reference = true;
   }
 

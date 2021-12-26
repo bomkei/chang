@@ -479,6 +479,11 @@ ObjectType Evaluater::evaluate(Node* node) {
         auto chk_type = node->expr != nullptr;
         obj.type = specified_type;
 
+        if( !chk_type && node->type->is_reference ) {
+          error(ERR_REFERENCE, node->token, "must have intiializer expression due to variable type was specified as reference");
+          exit(1);
+        }
+
         if( specified_type.arr_depth ) {
           auto flag = false;
 

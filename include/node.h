@@ -96,34 +96,26 @@ struct Node {
     bool is_allowed_let;
     bool is_allowed_empty_array;
     bool is_allowed_return;
-
-    struct {
-      Node* item = nullptr;
-      Node* member;
-    };
-
-    struct {
-      Node* func;
-      BuiltinFunc const* builtin;
-    };
-
-    struct {
-      Node* if_true;
-      Node* if_else;
-    };
-
-    struct {
-      bool is_reference;
-      bool evaluated;
-      Node* type;
-    };
-
-    struct {
-      long var_index;
-      Node* var_scope;
-      Object const* elemcount;
-    };
   };
+
+  Node* item = nullptr;
+  Node* member;
+
+  Node* func = nullptr;
+  BuiltinFunc const* builtin;
+
+  Node* if_true;
+  Node* if_else;
+
+  bool is_reference;
+  bool evaluated;
+  Node* type;
+
+  long var_index;
+  Node* var_scope;
+  Object const* elemcount;
+
+  std::size_t scope_depth = 0;
 
   Object& get_var() const {
     return var_scope->objects[var_index];

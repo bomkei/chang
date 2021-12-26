@@ -174,7 +174,8 @@ Object Interpreter::run_node(Node* node) {
       }
 
       if( !node->expr ) {
-        node->get_var() = construct_array(node->type->objtype.kind, node->objects.rend(), node->objects.rbegin());
+        if( node->is_make_array )
+          node->get_var() = construct_array(node->type->objtype.kind, node->objects.rend(), node->objects.rbegin());
       }
       else {
         node->get_var() = run_node(node->expr);

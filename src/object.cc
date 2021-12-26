@@ -46,6 +46,9 @@ std::string ObjectType::to_string() const {
     name += "[]";
   }
 
+  if( reference )
+    name += "&";
+
   return name;
 }
 
