@@ -309,8 +309,9 @@ Node* Parser::unary() {
   }
 
   if( consume("&") ) {
-    auto x = new Node(NODE_GET_ADDR);
+    auto x = new Node(NODE_REFERENCE);
 
+    x->token = consumed;
     x->expr = member();
 
     return x;

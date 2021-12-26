@@ -22,9 +22,34 @@ bool Evaluater::is_branchable(Node* node) {
   return false;
 }
 
+bool Evaluater::is_lvalue(Node* node) {
+  assert(node != nullptr);
+
+  switch( node->kind ) {
+    case NODE_VARIABLE:
+      return true;
+  }
+
+  return false;
+}
+
+Object* Evaluater::get_obj_addr(Node* node) {
+  assert(node != nullptr);
+  assert(is_lvalue(node));
+  
+  switch( node->kind ) {
+    case NODE_VARIABLE: {
+      return &node->get_var();
+    }
+  }
+
+  error(ERR_VALUE_TYPE, node->token, "please report to developer (code=0x9988ABAB)");
+  exit(1);
+}
+
 void Evaluater::check_array(std::vector<Node*>::const_iterator ec_list_it, std::vector<Object>::const_iterator ec_obj_list_it, std::size_t depth, Node* arr) {
   auto arr_type = evaluate(arr);
-  arr->elemcount = &*ec_obj_list_it;
+  arr->objptr = &*ec_obj_list_it;
 
   if( *ec_list_it != nullptr ) {
     if( arr->kind != NODE_ARRAY ) {
@@ -120,10 +145,8 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
   return { node };
 }
 
-ObjectType Evaluater::must_integrated(Node* node) {
-  assert(node->kind == NODE_SCOPE);
-
-  auto types = get_return_values(node);
+ObjectType Evaluater::must_integrated(Node* scope, std::vector<Node*> const& types) {
+  assert(scope->kind == NODE_SCOPE);
 
   if( types.empty() ) {
     return { };
@@ -140,7 +163,7 @@ ObjectType Evaluater::must_integrated(Node* node) {
     auto&& eval = evaluate(*it);
 
     if( !first.equals(eval) ) {
-      error(ERR_TYPE, node->token, "all values which can be return value of scope are must be integrated by one type.");
+      error(ERR_TYPE, scope->token, "all values which can be return value of scope are must be integrated by one type.");
       error(ERR_NOTE, types[0]->token, "return type was inferred as '%s' here", firststr.c_str());
       error(ERR_TYPE, (*it)->token, "expected '%s', but found '%s'", firststr.c_str(), eval.to_string().c_str());
       exit(1);
@@ -221,12 +244,42 @@ ObjectType Evaluater::evaluate(Node* node) {
       if( scope ) {
         node->var_scope = scope;
         node->var_index = index;
-        ret = scope->objects[index].type;
+
+        node->scope_depth = node->get_var().scope_depth;
+
+        alert;
+      #if __DEBUG__
+        fprintf(stderr,"node->scope_depth = %lu\n",node->scope_depth);
+      #endif
+
+        //ret = scope->objects[index].type;
+        ret = node->get_var().type;
+
         break;
       }
 
       error(ERR_UNDEFINED, node->token, "undefined variable name '%s'", Utils::str(node->name));
       exit(1);
+    }
+
+    case NODE_REFERENCE: {
+      if( !is_lvalue(node->expr) ) {
+        error(ERR_VALUE_TYPE, node->token, "expression is must lvalue");
+      }
+
+      ret = evaluate(node->expr);
+      ret.reference = true;
+
+      // node->expr == NODE_VARIABLE
+      node->scope_depth = node->expr->scope_depth;
+      node->objptr = get_obj_addr(node->expr);
+
+      alert;
+    #if __DEBUG__
+      fprintf(stderr,"node->scope_depth = %lu\n",node->scope_depth);
+    #endif
+
+      break;
     }
     
     case NODE_ARRAY: {
@@ -373,6 +426,7 @@ ObjectType Evaluater::evaluate(Node* node) {
 
         obj.type = evaluate(arg->type);
         obj.name = arg->name;
+        obj.scope_depth = scope_depth;
       }
 
       auto func_type = evaluate(node->type);
@@ -416,6 +470,9 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       scope_list.push_front(node);
 
+      scope_depth++;
+      node->scope_depth = scope_depth;
+
       auto returned = false;
       Node* ret_nd;
 
@@ -443,10 +500,27 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       if( node != Global::get_instance()->top_node ) {
-        ret = must_integrated(node);
+        auto const& ret_nodes = get_return_values(node);
+
+        ret = must_integrated(node, ret_nodes);
+
+        for( auto&& i : ret_nodes ) {
+          auto&& e = evaluate(i);
+
+          alert;
+        #if __DEBUG__
+          fprintf(stderr,"%lu %lu\n",node->scope_depth,i->scope_depth);
+        #endif
+
+          if( e.reference && node->scope_depth <= i->scope_depth ) {
+            error(ERR_LIFE_SPAN, i->token, "this is cannot be take out and use from scope");
+          }
+        }
       }
 
+      scope_depth--;
       scope_list.pop_front();
+
       break;
     }
 
@@ -469,6 +543,12 @@ ObjectType Evaluater::evaluate(Node* node) {
       auto& obj = cur->objects.emplace_back();
 
       obj.name = node->name;
+      obj.scope_depth = cur->scope_depth;
+
+      alert;
+    #if __DEBUG__
+      fprintf(stderr,"obj.scope_depth = %lu\n",obj.scope_depth);
+    #endif
 
       node->var_scope = cur;
       node->var_index = cur->objects.size() - 1;

@@ -27,13 +27,13 @@ struct ObjectType {
 struct Object {
   ObjectType type;
   std::string_view name;
+  std::size_t scope_depth = 0;
 
   union {
     long v_int = 0;
     char16_t v_char;
     double v_float;
     bool v_bool;
-    Object* address;
   };
 
   std::u16string v_str;

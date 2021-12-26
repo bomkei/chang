@@ -10,7 +10,7 @@ enum NodeKind {
   NODE_ARRAY,
   NODE_INDEX_REF,
 
-  NODE_GET_ADDR,
+  NODE_REFERENCE,
   NODE_MEMBER_ACCESS,
 
   // argument
@@ -91,12 +91,10 @@ struct Node {
   ObjectType objtype;
   std::vector<Node*> elemcount_list;
 
-  union {
-    bool is_make_array;
-    bool is_allowed_let;
-    bool is_allowed_empty_array;
-    bool is_allowed_return;
-  };
+  bool is_make_array;
+  bool is_allowed_let;
+  bool is_allowed_empty_array;
+  bool is_allowed_return;
 
   Node* item = nullptr;
   Node* member;
@@ -113,7 +111,7 @@ struct Node {
 
   long var_index;
   Node* var_scope;
-  Object const* elemcount;
+  Object const* objptr;
 
   std::size_t scope_depth = 0;
 
