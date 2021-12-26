@@ -72,6 +72,10 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
       return v;
     }
 
+    case NODE_RETURN: {
+      return node->expr;
+    }
+
     case NODE_SCOPE: {
       Vec v;
 
@@ -102,26 +106,6 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
   }
 
   return { node };
-}
-
-std::pair<bool, Node*> Evaluater::is_integrated(Node* node) {
-  // dont use
-
-  ObjectType type;
-  auto&& vec = get_return_values(node);
-
-  for( auto it = vec.begin(); it != vec.end(); it++ ) {
-    if( it == vec.begin() ) {
-      type = evaluate(*it);
-      continue;
-    }
-    
-    if( !type.equals(evaluate(*it)) ) {
-      return { false, *it };
-    }
-  }
-
-  return { true, nullptr };
 }
 
 ObjectType Evaluater::must_integrated(Node* node) {
@@ -419,6 +403,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         }
         
         i->is_allowed_let = true;
+        i->is_allowed_return = true;
         evaluate(i);
       }
 
@@ -504,7 +489,9 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_IF: {
-      evaluate(node->expr);
+      if( !evaluate(node->expr).equals(OBJ_BOOL) ) {
+        error(ERR_TYPE, node->token, "condition is must boolean");
+      }
 
       ret = evaluate(node->if_true);
 
@@ -515,6 +502,14 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       break;
+    }
+
+    case NODE_RETURN: {
+      if( !node->is_allowed_return ) {
+        error(ERR_LOCATION, node->token, "cannot use return here");
+      }
+
+      return evaluate(node->expr);
     }
 
     case NODE_EXPR: {

@@ -184,6 +184,14 @@ Object Interpreter::run_node(Node* node) {
       break;
     }
 
+    case NODE_IF: {
+      if( run_node(node->expr).v_bool ) {
+        return run_node(node->if_true);
+      }
+      
+      return run_node(node->if_else);
+    }
+
     case NODE_EXPR: {
       auto obj = run_node(node->expr);
 

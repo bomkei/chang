@@ -300,9 +300,10 @@ struct Node {
   Object const* elemcount;
   std::vector<Node*> elemcount_list;
 
-  // if self is NODE_VAR, this is can use to check if placed self on allowed area.
-  // example for, root in scope.
+  // these are used in location specific statements.
+  // if true, meaning that can be placed to there.
   bool is_allowed_let = false;
+  bool is_allowed_return = false;
 
   // is allowed empty arr
   bool is_allowed_empty_array = false;
@@ -388,14 +389,6 @@ private:
 
   //  get all nodes which can be return value
   std::vector<Node*> get_return_values(Node* node);
-
-  // check if all nodes which can be
-  //  return value has integrated as same types.
-  //
-  // return:
-  //   [true, nullptr]  = integrated
-  //   [false, <node>]  = not integrated
-  std::pair<bool, Node*> is_integrated(Node* node); // dont use
 
   ObjectType must_integrated(Node* node);
 
