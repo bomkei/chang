@@ -452,9 +452,11 @@ Node* Parser::top() {
     node->expr = expr();
 
     if( is_main ) {
-      auto zero = node->expr->list.emplace_back(new Node(NODE_RETURN));
+      auto zero = Global::get_instance()->main_zero = node->expr->list.emplace_back(new Node(NODE_VALUE));
 
       zero->token = token->back;
+      assert(token->back->str == "}");
+
       zero->obj.type = OBJ_INT;
     }
 

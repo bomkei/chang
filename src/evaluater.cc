@@ -77,6 +77,10 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
     }
 
     case NODE_SCOPE: {
+      if( node->list.empty() ) {
+        return { };
+      }
+
       Vec v;
       Vec::const_iterator begin = node->list.end() - 1;
 
@@ -419,7 +423,10 @@ ObjectType Evaluater::evaluate(Node* node) {
           continue;
         }
 
-        if( returned && !in_main ) {
+        if( returned ) {
+          if( i == Global::get_instance()->main_zero )
+            continue;
+
           error(ERR_RETURN, i->token, "code is invalid after return statement");
           error(ERR_NOTE, ret_nd->token, "returned here");
         }
