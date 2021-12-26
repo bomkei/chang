@@ -65,10 +65,6 @@ Node* Parser::expect_argument() {
 Node* Parser::expect_type() {
   Node* node = new Node(NODE_TYPE);
 
-  if( consume("&") ) {
-    node->is_reference = true;
-  }
-
   expect_ident();
   node->token = token;
   node->name = token->str;
@@ -96,6 +92,10 @@ Node* Parser::expect_type() {
       node->elemcount_list.emplace_back(expr());
       expect("]");
     }
+  }
+
+  if( consume("&") ) {
+    node->is_reference = true;
   }
 
   return node;
