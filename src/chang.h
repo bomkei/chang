@@ -412,7 +412,7 @@ public:
 
   
 
-  Object construct_array(ObjectType type, EcObjIt end, EcObjIt it);
+  Object construct_array(ObjectKind kind, EcObjIt end, EcObjIt it);
   void fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr);
 
   static Interpreter* get_instance();

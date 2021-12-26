@@ -424,6 +424,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         
         i->is_allowed_let = true;
         i->is_allowed_return = true;
+        
         evaluate(i);
       }
 

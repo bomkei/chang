@@ -42,14 +42,11 @@ void Interpreter::div(Object& obj, Object& item) {
   }
 }
 
-Object Interpreter::construct_array(ObjectType type, Interpreter::EcObjIt end, Interpreter::EcObjIt it) {
-  Object obj;
-  obj.type = type;
-  obj.type.arr_depth = 1;
+Object Interpreter::construct_array(ObjectKind kind, Interpreter::EcObjIt end, Interpreter::EcObjIt it) {
+  Object obj, elem;
 
-  Object elem;
-  elem.type = type;
-  elem.type.arr_depth = 0;
+  (obj.type = elem.type = kind).arr_depth = 0;
+  obj.type.arr_depth = 1;
 
   while( true ) {
     for( long i = 0; i < it->v_int; i++ ) {
@@ -139,7 +136,7 @@ Object Interpreter::run_node(Node* node) {
 
       if( node->is_allowed_empty_array ) {
         auto var_s = *var_stmt_list.begin();
-        return construct_array(node->objtype, var_s->objects.rend(), var_s->objects.rbegin());
+        return construct_array(node->objtype.kind, var_s->objects.rend(), var_s->objects.rbegin());
       }
       else {
         for( auto&& i : node->list ) {
@@ -178,7 +175,7 @@ Object Interpreter::run_node(Node* node) {
       }
 
       if( !node->expr ) {
-        node->get_var() = construct_array(node->type->objtype, node->objects.rend(), node->objects.rbegin());
+        node->get_var() = construct_array(node->type->objtype.kind, node->objects.rend(), node->objects.rbegin());
       }
       else {
         node->get_var() = run_node(node->expr);
