@@ -356,6 +356,7 @@ ObjectType Evaluater::evaluate(Node* node) {
         ret.arr_depth++;
       }
 
+      ret.reference = node->is_reference;
       break;
     }
 

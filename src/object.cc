@@ -6,7 +6,7 @@ bool ObjectType::equals(ObjectType const& type) const {
       // todo
     }
 
-    if( arr_depth == type.arr_depth )
+    if( arr_depth == type.arr_depth && reference == type.reference )
       return true;
   }
 
