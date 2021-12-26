@@ -223,7 +223,6 @@ Node* Parser::primary() {
       break;
     
     case TOK_STRING:
-      alert;
       node->obj.type = OBJ_STRING;
       node->obj.v_str = Utils::String::to_utf16(token->str);
       break;
@@ -451,12 +450,10 @@ Node* Parser::top() {
     node->expr = expr();
 
     if( is_main ) {
-      auto x = new Node(NODE_SCOPE);
+      auto zero = node->expr->list.emplace_back(new Node(NODE_RETURN));
 
-      x->list.emplace_back(node->expr);
-      x->list.emplace_back(new Node(NODE_VALUE))->obj.type = OBJ_INT;
-
-      node->expr = x;
+      zero->token = token->back;
+      zero->obj.type = OBJ_INT;
     }
 
     return node;

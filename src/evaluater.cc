@@ -208,10 +208,7 @@ ObjectType Evaluater::evaluate(Node* node) {
 
   switch( node->kind ) {
     case NODE_VALUE:
-      alert;
       ret = node->obj.type;
-  
-
       break;
     
     case NODE_VARIABLE: {
@@ -364,6 +361,8 @@ ObjectType Evaluater::evaluate(Node* node) {
     }
 
     case NODE_FUNCTION: {
+      in_main = node->name == "main";
+
       for( auto&& arg : node->list ) {
         auto& obj = node->expr->objects.emplace_back();
 
@@ -395,9 +394,13 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       if( err ) {
-        error(ERR_NOTE, node->type ? node->type->token : node->token, "specified here");
+        error(
+          ERR_NOTE, node->type ? node->type->token : node->token,
+          "specified with '%s' here", node->type ? Utils::str(node->type->name) : "int"
+        );
       }
 
+      in_main = false;
       break;
     }
 
@@ -405,18 +408,18 @@ ObjectType Evaluater::evaluate(Node* node) {
       if( node->list.empty() ) {
         break;
       }
-      
+
       scope_list.push_front(node);
 
       auto returned = false;
       Node* ret_nd;
-      
+
       for( auto&& i : node->list ) {
         if( !i ) {
           continue;
         }
 
-        if( returned ) {
+        if( returned && !in_main ) {
           error(ERR_RETURN, i->token, "code is invalid after return statement");
           error(ERR_NOTE, ret_nd->token, "returned here");
         }
@@ -424,21 +427,17 @@ ObjectType Evaluater::evaluate(Node* node) {
           returned = true;
           ret_nd = i;
         }
-        
-        alert;
+
         i->is_allowed_let = true;
         i->is_allowed_return = true;
-        
-        alert;
+
         evaluate(i);
       }
 
-      alert;
       if( node != Global::get_instance()->top_node ) {
         ret = must_integrated(node);
       }
 
-      alert;
       scope_list.pop_front();
       break;
     }
@@ -474,7 +473,7 @@ ObjectType Evaluater::evaluate(Node* node) {
 
         if( specified_type.arr_depth ) {
           auto flag = false;
-          
+
           node->is_make_array = true;
 
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
