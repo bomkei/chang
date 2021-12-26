@@ -1,41 +1,52 @@
 TARGET		= chang
 
+INCLUDES	= include
+SOURCES		= src
+SUBDIRS		=
 BUILD			= build
-SRCDIR		= src
-SOURCES		= $(wildcard $(SRCDIR)/*.cc)
-OFILES		= $(patsubst %.cc,$(BUILD)/%.o,$(notdir $(SOURCES)))
-HEADER		= $(SRCDIR)/$(TARGET).h
 
-DEST		= /usr/local/bin
+COMMONFLAGS		= -O2
+CXXFLAGS			= $(COMMONFLAGS) $(INCLUDE) -std=c++20 -Wno-switch
+LDFLAGS				= -Wl,--gc-sections
 
-COMMON		= -O2
-CXXFLAGS	= $(COMMON) -std=c++20 -Wno-switch
-LDFLAGS		= -Wl,--gc-sections
+%.o: %.cc
+	@echo $(notdir $<)
+	@clang++ -MP -MMD -MF $*.d $(CXXFLAGS) -c -o $@ $<
 
-all: $(TARGET)
+ifneq ($(notdir $(CURDIR)), $(BUILD))
+
+SRCDIRS		= $(SOURCES) $(foreach dir,$(SUBDIRS),$(SOURCES)/$(dir))
+CXXFILES	= $(foreach dir,$(SRCDIRS),$(notdir $(wildcard $(dir)/*.cc)))
+
+export VPATH		= $(CURDIR)/$(SOURCES) $(foreach dir,$(SUBDIRS),$(CURDIR)/$(SOURCES)/$(dir))
+export OFILES		= $(CXXFILES:.cc=.o)
+export OUTPUT		= $(CURDIR)/$(TARGET)
+export INCLUDE	= $(foreach dir,$(INCLUDES),-I $(CURDIR)/$(dir))
+
+all: $(BUILD)
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+
+debug: $(BUILD)
+	@$(MAKE) --no-print-directory COMMONFLAGS="-O0 -g" LDFLAGS="" -C $(BUILD) -f $(CURDIR)/Makefile
 
 clean:
-	@rm -drf $(BUILD)
-	@rm -drf $(TARGET)
+	@rm -rf $(BUILD)
+	@rm -f $(TARGET)
 
 re: clean all
 
-debug:
-	@$(MAKE) --no-print-directory CXXFLAGS="-g -O0 -std=c++20"
+$(BUILD):
+	@[ -d $@ ] || mkdir -p $@
 
-install: all
-	@echo installing...
-	@install -s $(TARGET) $(DEST)
+else
 
-uninstall:
-	@echo uninstalling...
-	@rm -f $(DEST)/$(TARGET)
+DEPENDS	= $(OFILES:.o=.d)
 
-$(BUILD)/%.o: $(SRCDIR)/%.cc $(HEADER)
-	@echo $(notdir $<)
-	@[ -d $(BUILD) ] || mkdir -p $(BUILD)
-	@clang++ $(CXXFLAGS) -c -o $@ $<
-
-$(TARGET): $(OFILES)
+$(OUTPUT): $(OFILES)
 	@echo linking...
 	@clang++ $(LDFLAGS) -o $@ $^
+
+-include $(DEPENDS)
+
+endif
+
