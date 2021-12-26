@@ -223,6 +223,7 @@ Node* Parser::primary() {
       break;
     
     case TOK_STRING:
+      alert;
       node->obj.type = OBJ_STRING;
       node->obj.v_str = Utils::String::to_utf16(token->str);
       break;
@@ -255,14 +256,13 @@ Node* Parser::primary() {
       if( token->str == "true" || token->str == "false" ) {
         node->obj.type = OBJ_BOOL;
         node->obj.v_bool = token->str == "true";
+        break;
       }
       else if( token->str == "none" ) {
-        
+        break;
       }
-      else
-        goto unk;
-      
-      break;
+
+      goto unk;
     }
   }
 

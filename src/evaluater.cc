@@ -197,18 +197,24 @@ std::vector<Node*> Evaluater::find_func(std::string_view const& name, std::vecto
 }
 
 ObjectType Evaluater::evaluate(Node* node) {
+  alert;
   if( !node )
     return { };
 
+  alert;
   if( node->evaluated )
     return node->objtype;
 
+  alert;
   auto& ret = node->objtype;
   node->evaluated = true;
 
   switch( node->kind ) {
     case NODE_VALUE:
+      alert;
       ret = node->obj.type;
+  
+
       break;
     
     case NODE_VARIABLE: {
@@ -409,29 +415,35 @@ ObjectType Evaluater::evaluate(Node* node) {
       Node* ret_nd;
       
       for( auto&& i : node->list ) {
-        if( !i ) {
-          continue;
-        }
+        // if( !i ) {
+        //   continue;
+        // }
 
+    if(i){
         if( returned ) {
-          error(ERR_WARN, i->token, "this is not to be done due to found return statement at behind this");
-          error(ERR_NOTE, ret_nd->token, "already returned here");
+          error(ERR_RETURN, i->token, "code is invalid after return statement");
+          error(ERR_NOTE, ret_nd->token, "returned here");
         }
         else if( i->kind == NODE_RETURN ) {
           returned = true;
           ret_nd = i;
         }
         
+        alert;
         i->is_allowed_let = true;
         i->is_allowed_return = true;
         
+        alert;
         evaluate(i);
+    }
       }
 
+      alert;
       if( node != Global::get_instance()->top_node ) {
         ret = must_integrated(node);
       }
 
+      alert;
       scope_list.pop_front();
       break;
     }

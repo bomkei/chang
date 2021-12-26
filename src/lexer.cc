@@ -1,6 +1,6 @@
 #include "chang.h"
 
-static char const* operator_token_list[] = {
+static char const* reserved_tokens[] = {
   "continue",
   "return",
   "false",
@@ -8,6 +8,7 @@ static char const* operator_token_list[] = {
   "break",
   "true",
   "loop",
+  "none",
   "var",
   "for",
   "if",
@@ -55,6 +56,13 @@ Token* Lexer::lex() {
     else if( isalpha(ch) || ch == '_' ) {
       cur->kind = TOK_IDENT;
       cur->str = { str, pass_ident() };
+
+      for( auto&& i : reserved_tokens ) {
+        if( i == cur->str ) {
+          cur->kind = TOK_RESERVED;
+          break;
+        }
+      }
     }
 
     // string
@@ -66,7 +74,7 @@ Token* Lexer::lex() {
     }
 
     else {
-      for( std::string_view&& op : operator_token_list ) {
+      for( std::string_view&& op : reserved_tokens ) {
         if( match(op) ) {
           cur->kind = TOK_RESERVED;
           cur->str = op;

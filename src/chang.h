@@ -410,8 +410,6 @@ public:
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
 
-  
-
   Object construct_array(ObjectKind kind, EcObjIt end, EcObjIt it);
   void fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr);
 
@@ -451,6 +449,7 @@ enum ErrorKind {
   ERR_UNDEFINED,
   ERR_MULTIPLE_DEFINED,
   ERR_MANY_CANDIDATES,
+  ERR_RETURN,
   ERR_LOCATION,
   ERR_ARGUMENT,
   ERR_TYPE,
