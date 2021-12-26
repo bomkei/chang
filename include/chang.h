@@ -14,95 +14,13 @@
 #include <locale>
 #include <map>
 
-enum TokenKind {
-  TOK_INT,
-  TOK_CHAR,
-  TOK_FLOAT,
-  TOK_STRING,
-  TOK_IDENT,
-  TOK_RESERVED,
-  TOK_EOF
-};
+#include "debug.h"
+#include "values.h"
 
-struct Token {
-  TokenKind kind;
-  std::string_view str;
-  Token* back;
-  Token* next;
-  std::size_t pos;
-  
-  Token() { }
-
-  Token(TokenKind kind, Token* back, std::size_t pos)
-    : kind(kind), back(back), pos(pos) {
-    if( back ) {
-      back->next = this;
-    }
-  }
-
-  Token* insert(std::string_view const& str, TokenKind kind = TOK_RESERVED) {
-    auto tok = new Token;
-
-    tok->kind = kind;
-    tok->str = str;
-    tok->back = this;
-    tok->next = this->next;
-
-    this->next = tok;
-    return tok;
-  }
-
-  static Token* from_string(std::string_view const& str, TokenKind kind = TOK_IDENT) {
-    auto tok = new Token;
-
-    tok->kind = kind;
-    tok->str = str;
-
-    return tok;
-  }
-};
-
-enum ObjectKind {
-  OBJ_INT,
-  OBJ_CHAR,
-  OBJ_FLOAT,
-  OBJ_BOOL,
-  OBJ_STRING,
-  OBJ_TUPLE,
-  OBJ_NONE
-};
-
-struct ObjectType {
-  ObjectKind kind;
-  std::vector<ObjectType> elems;
-  std::size_t arr_depth = 0;
-  bool reference = false;
-  
-  ObjectType(ObjectKind kind = OBJ_NONE)
-    : kind(kind) {
-  }
-
-  bool equals(ObjectType const&) const;
-  std::string to_string() const;
-};
-
-struct Object {
-  ObjectType type;
-  std::string_view name;
-
-  union {
-    long v_int = 0;
-    char16_t v_char;
-    double v_float;
-    bool v_bool;
-    Object* address;
-  };
-
-  std::u16string v_str;
-  std::vector<Object> list;
-
-  std::string to_string() const;
-};
+#include "utils.h"
+#include "token.h"
+#include "object.h"
+#include "node.h"
 
 class Lexer {
 public:

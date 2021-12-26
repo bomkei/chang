@@ -197,15 +197,12 @@ std::vector<Node*> Evaluater::find_func(std::string_view const& name, std::vecto
 }
 
 ObjectType Evaluater::evaluate(Node* node) {
-  alert;
   if( !node )
     return { };
 
-  alert;
   if( node->evaluated )
     return node->objtype;
 
-  alert;
   auto& ret = node->objtype;
   node->evaluated = true;
 

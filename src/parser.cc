@@ -285,7 +285,13 @@ Node* Parser::member() {
       node = x;
     }
     else {
-      x = new Node(NODE_MEMBER_ACCESS, node, x, consumed);
+      //x = new Node(NODE_MEMBER_ACCESS, node, x, consumed);
+      auto y = new Node(NODE_MEMBER_ACCESS);
+      
+      y->item = node;
+      y->member = x;
+
+      x = y;
     }
   }
 

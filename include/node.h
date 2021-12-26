@@ -86,37 +86,54 @@ struct Node {
   std::vector<Enum> enum_list;
 
   std::string_view name;
-  Node* type;
   Node* expr;
-  Node* func;
 
-  Node* if_true;
-  Node* if_else;
-
-  bool is_reference = false;
-  bool evaluated = false;
   ObjectType objtype;
-
-  // variable
-  Node* var_scope;
-  long var_index = -1;
-
-  bool is_make_array = false;
-  Object const* elemcount;
   std::vector<Node*> elemcount_list;
+
+  union {
+    bool is_make_array;
+    bool is_allowed_let;
+    bool is_allowed_empty_array;
+    bool is_allowed_return;
+
+    struct {
+      Node* item = nullptr;
+      Node* member;
+    };
+
+    struct {
+      Node* func;
+      BuiltinFunc const* builtin;
+    };
+
+    struct {
+      Node* if_true;
+      Node* if_else;
+    };
+
+    struct {
+      bool is_reference;
+      bool evaluated;
+      Node* type;
+    };
+
+    struct {
+      long var_index;
+      Node* var_scope;
+      Object const* elemcount;
+    };
+  };
 
   // these are used in location specific statements.
   // if true, it is meaning can be placed to there.
-  bool is_allowed_let = false;
-  bool is_allowed_return = false;
 
   // is allowed empty arr
-  bool is_allowed_empty_array = false;
 
   // built-in func
-  BuiltinFunc const* builtin = nullptr;
 
   Object& get_var() const {
+    sizeof(Node);
     return var_scope->objects[var_index];
   }
 
@@ -133,7 +150,7 @@ struct Node {
     : kind(kind) {
   }
 
-  Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok = nullptr)
-    : kind(kind), lhs(lhs), rhs(rhs), token(tok) {
-  }
+  // Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok = nullptr)
+  //   : kind(kind), lhs(lhs), rhs(rhs), token(tok) {
+  // }
 };
