@@ -412,11 +412,10 @@ ObjectType Evaluater::evaluate(Node* node) {
       Node* ret_nd;
       
       for( auto&& i : node->list ) {
-        // if( !i ) {
-        //   continue;
-        // }
+        if( !i ) {
+          continue;
+        }
 
-    if(i){
         if( returned ) {
           error(ERR_RETURN, i->token, "code is invalid after return statement");
           error(ERR_NOTE, ret_nd->token, "returned here");
@@ -432,7 +431,6 @@ ObjectType Evaluater::evaluate(Node* node) {
         
         alert;
         evaluate(i);
-    }
       }
 
       alert;

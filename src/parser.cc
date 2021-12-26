@@ -451,7 +451,12 @@ Node* Parser::top() {
     node->expr = expr();
 
     if( is_main ) {
-      node->expr->list.emplace_back(new Node(NODE_VALUE))->obj.type = OBJ_INT;
+      auto x = new Node(NODE_SCOPE);
+
+      x->list.emplace_back(node->expr);
+      x->list.emplace_back(new Node(NODE_VALUE))->obj.type = OBJ_INT;
+
+      node->expr = x;
     }
 
     return node;
