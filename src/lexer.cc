@@ -28,6 +28,8 @@ Token* Lexer::lex() {
   Token top;
   Token* cur = &top;
 
+  pass_space();
+
   while( check() ) {
     auto ch = peek();
     auto pos = position;

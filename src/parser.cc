@@ -403,6 +403,8 @@ Node* Parser::expr() {
     node->token = consumed;
     node->expr = expr();
 
+    assert(node->expr);
+
     return node;
   }
 
