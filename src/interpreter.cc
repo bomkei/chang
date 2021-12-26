@@ -154,6 +154,10 @@ Object Interpreter::run_node(Node* node) {
       Object obj;
 
       for( auto&& item : node->list ) {
+        if( item && item->kind == NODE_RETURN ) {
+          return run_node(item->expr);
+        }
+
         obj = run_node(item);
       }
 

@@ -301,7 +301,7 @@ struct Node {
   std::vector<Node*> elemcount_list;
 
   // these are used in location specific statements.
-  // if true, meaning that can be placed to there.
+  // if true, it is meaning can be placed to there.
   bool is_allowed_let = false;
   bool is_allowed_return = false;
 

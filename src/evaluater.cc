@@ -73,13 +73,21 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
     }
 
     case NODE_RETURN: {
-      return node->expr;
+      return { node->expr };
     }
 
     case NODE_SCOPE: {
       Vec v;
+      Vec::const_iterator begin = node->list.end() - 1;
 
-      for( auto it = node->list.rbegin(); it != node->list.rend(); it++ ) {
+      for( auto it = node->list.begin(); it != node->list.end(); it++ ) {
+        if( *it && (*it)->kind == NODE_RETURN ) {
+          begin = it;
+          break;
+        }
+      }
+
+      for( auto it = begin; it >= node->list.begin(); it-- ) {
         for( auto&& i : get_return_values(*it) ) {
           v.emplace_back(i);
         }
@@ -396,10 +404,22 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
       
       scope_list.push_front(node);
+
+      auto returned = false;
+      Node* ret_nd;
       
       for( auto&& i : node->list ) {
         if( !i ) {
           continue;
+        }
+
+        if( returned ) {
+          error(ERR_WARN, i->token, "this is not to be done due to found return statement at behind this");
+          error(ERR_NOTE, ret_nd->token, "already returned here");
+        }
+        else if( i->kind == NODE_RETURN ) {
+          returned = true;
+          ret_nd = i;
         }
         
         i->is_allowed_let = true;

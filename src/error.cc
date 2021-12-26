@@ -16,7 +16,9 @@ void error(ErrorKind kind, Token* token, char const* fmt, ...) {
   std::size_t column = 0;
   std::size_t line_begin = 0, line_end = src.length();
 
-  globl->is_error_occurred = true;
+  if( kind != ERR_NOTE && kind != ERR_WARN ) {
+    globl->is_error_occurred = true;
+  }
 
   for( std::size_t i = 0; i < token->pos; i += 1 ) {
     if( src[i] == '\n' ) {
