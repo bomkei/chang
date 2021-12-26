@@ -125,15 +125,7 @@ struct Node {
     };
   };
 
-  // these are used in location specific statements.
-  // if true, it is meaning can be placed to there.
-
-  // is allowed empty arr
-
-  // built-in func
-
   Object& get_var() const {
-    sizeof(Node);
     return var_scope->objects[var_index];
   }
 
@@ -149,8 +141,4 @@ struct Node {
   Node(NodeKind kind)
     : kind(kind) {
   }
-
-  // Node(NodeKind kind, Node* lhs, Node* rhs, Token* tok = nullptr)
-  //   : kind(kind), lhs(lhs), rhs(rhs), token(tok) {
-  // }
 };
