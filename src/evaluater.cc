@@ -264,7 +264,8 @@ ObjectType Evaluater::evaluate(Node* node) {
 
     case NODE_REFERENCE: {
       if( !is_lvalue(node->expr) ) {
-        error(ERR_VALUE_TYPE, node->token, "expression is must lvalue");
+        error(ERR_VALUE_TYPE, node->expr->token, "expression is must lvalue");
+        exit(1);
       }
 
       ret = evaluate(node->expr);
