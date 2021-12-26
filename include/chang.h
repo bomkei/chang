@@ -98,6 +98,7 @@ private:
   std::vector<ObjectType> eval_func_args(Node* func);
   std::vector<Node*> find_func(std::string_view const& name, std::vector<ObjectType> const& arg_types);
 
+  bool in_main = false;
   std::list<Node*> scope_list;
   std::list<Node*> var_stmt_list;
 };
