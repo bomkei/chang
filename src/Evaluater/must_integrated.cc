@@ -2,6 +2,7 @@
 #include "object.h"
 #include "node.h"
 #include "error.h"
+#include "debug.h"
 #include "evaluater.h"
 
 ObjectType Evaluater::must_integrated(Node* scope, std::vector<Node*> const& types) {

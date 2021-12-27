@@ -1,3 +1,8 @@
+#include "token.h"
+#include "object.h"
+#include "node.h"
+#include "error.h"
+#include "debug.h"
 #include "evaluater.h"
 
 std::vector<Node*> Evaluater::get_return_values(Node* node) {
