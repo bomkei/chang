@@ -113,32 +113,3 @@ struct BuiltinFunc {
 private:
   BuiltinFunc(char const*, bool, std::vector<ObjectType>, ObjectType, FuncPointer);
 };
-
-struct Global {
-  std::string source;
-  std::string file_path;
-  Node* entry_point = nullptr;
-  Node* top_node = nullptr;
-  Node* main_zero = nullptr;
-
-  bool is_error_occurred = false;
-
-  static Global* get_instance();
-
-private:
-  Global();
-  friend class Driver;
-};
-
-class Driver {
-public:
-  Driver();
-  ~Driver();
-
-  bool parse_arguments(int argc, char** argv);
-
-  int main(int argc, char** argv);
-
-private:
-  Global global;
-};
