@@ -103,8 +103,13 @@ ObjectType Evaluater::stmt(Node* node) {
       node->var_index = cur->objects.size() - 1;
 
       auto specified_type = evaluate(node->type);
+      ObjectType expr_type;
 
       if( specified_type.reference || (node->expr && node->expr->kind == NODE_REFERENCE) ) {
+        if( node->expr && !node->expr->evaluated ) {
+          expr_type = evaluate(node->expr);
+        }
+
         if( !node->expr ) {
           error(ERR_REFERENCE, node->token, "must have intiializer expression due to variable type was specified as reference");
           exit(1);
@@ -130,7 +135,7 @@ ObjectType Evaluater::stmt(Node* node) {
         auto chk_type = node->expr != nullptr;
         obj.type = specified_type;
 
-        if( node->expr && !specified_type.equals(evaluate(node->expr)) ) {
+        if( node->expr && !specified_type.equals(expr_type) ) {
           error(ERR_TYPE, node->token, "type mismatch");
           exit(1);
         }

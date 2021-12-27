@@ -32,6 +32,7 @@ bool Evaluater::is_lvalue(Node* node) {
 Object* Evaluater::get_obj_addr(Node* node) {
   assert(node != nullptr);
   assert(is_lvalue(node));
+  assert(node->evaluated);
   
   switch( node->kind ) {
     case NODE_VARIABLE: {
