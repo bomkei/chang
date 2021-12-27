@@ -1,5 +1,10 @@
 #pragma once
 
+#include <codecvt>
+#include <locale>
+#include <string>
+#include <vector>
+
 namespace Utils {
   inline auto str(std::string_view const& str) {
     static char buf[0x1000];
