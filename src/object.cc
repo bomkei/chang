@@ -53,6 +53,10 @@ std::string ObjectType::to_string() const {
 }
 
 std::string Object::to_string() const {
+  if( type.reference ) {
+    return address->to_string();
+  }
+
   if( type.arr_depth ) {
     std::string str = "[";
 

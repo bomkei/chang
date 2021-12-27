@@ -96,14 +96,12 @@ Object Interpreter::run_node(Node* node) {
   
   switch( node->kind ) {
     case NODE_VALUE:
+    case NODE_REFERENCE: {
       return node->obj;
+    }
 
     case NODE_VARIABLE:
       return run_lvalue(node);
-
-    case NODE_REFERENCE: {
-      return *node->objptr;
-    }
 
     case NODE_CALLFUNC: {
       std::vector<Object> args;

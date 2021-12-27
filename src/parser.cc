@@ -374,6 +374,24 @@ Node* Parser::add() {
   return node;
 }
 
+Node* Parser::assign() {
+  auto x = add();
+
+  if( consume("=") ) {
+    auto y = new Node(NODE_ASSIGN);
+
+    y->expr = x;
+
+    do {
+      y->list.emplace_back(add());
+    } while( consume("=") );
+
+    x = y;
+  }
+
+  return x;
+}
+
 Node* Parser::expr() {
   if( consume("var") ) {
     auto node = new Node(NODE_VAR);

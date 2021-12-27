@@ -34,6 +34,7 @@ struct Object {
     char16_t v_char;
     double v_float;
     bool v_bool;
+    Object const* address;
   };
 
   std::u16string v_str;

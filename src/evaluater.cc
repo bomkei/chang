@@ -272,8 +272,10 @@ ObjectType Evaluater::evaluate(Node* node) {
       ret.reference = true;
 
       // node->expr == NODE_VARIABLE
+      
       node->scope_depth = node->expr->scope_depth;
-      node->objptr = get_obj_addr(node->expr);
+      node->obj.type = ret;
+      node->obj.address = node->objptr = get_obj_addr(node->expr);
 
       alert;
     #if __DEBUG__
