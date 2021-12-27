@@ -53,6 +53,7 @@ public:
   Node* unary();
   Node* mul();
   Node* add();
+  Node* assign();
   Node* expr();
   Node* top();
 

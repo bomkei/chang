@@ -428,7 +428,7 @@ Node* Parser::expr() {
     return node;
   }
 
-  return add();
+  return assign();
 }
 
 Node* Parser::top() {

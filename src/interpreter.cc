@@ -195,6 +195,14 @@ Object Interpreter::run_node(Node* node) {
       return run_node(node->if_else);
     }
 
+    case NODE_ASSIGN: {
+      for( auto it = node->list.rbegin() + 1; it != node->list.rend(); it++ ) {
+        run_lvalue(*it) = run_node(*(it - 1));
+      }
+
+      return run_lvalue(node->expr) = run_node(*node->list.begin());
+    }
+
     case NODE_EXPR: {
       auto obj = run_node(node->expr);
 

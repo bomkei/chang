@@ -635,6 +635,26 @@ ObjectType Evaluater::evaluate(Node* node) {
       return evaluate(node->expr);
     }
 
+    case NODE_ASSIGN: {
+      if( !is_lvalue(node->expr) ) {
+        error(ERR_VALUE_TYPE, node->expr->token, "expression is must lvalue");
+      }
+
+      ret = evaluate(node->expr);
+
+      for( auto&& i : node->list ) {
+        if( i != *node->list.rbegin() && !is_lvalue(i) ) {
+          error(ERR_VALUE_TYPE, i->token, "expression is must lvalue");
+        }
+
+        if( !ret.equals(evaluate(i)) ) {
+          error(ERR_TYPE, i->token, "type mismatch");
+        }
+      }
+
+      break;
+    }
+
     case NODE_EXPR: {
       ret = evaluate(node->expr);
 
