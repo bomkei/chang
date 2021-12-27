@@ -27,7 +27,7 @@ ObjectType Evaluater::func(Node* node) {
       )
     ) {
       errortext("In special function 'main'");
-      error(ERR_MAIN_FUNC, node->token, "arguments are must empty, or <string[]>");
+      error(ERR_MAIN_FUNC, node->token, "arguments are must empty, or string[]");
     }
   }
 

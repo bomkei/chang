@@ -12,7 +12,7 @@ void errortext(char const* fmt, ...) {
   vsprintf(buf, fmt, ap);
   va_end(ap);
 
-  printf(COL_WHITE "%s: %s\n", buf);
+  printf(COL_WHITE "%s: %s\n", Global::get_instance()->file_path.c_str(), buf);
 }
 
 void error(ErrorKind kind, Token* token, char const* fmt, ...) {

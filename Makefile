@@ -19,6 +19,11 @@ COMMONFLAGS		= -O2
 CXXFLAGS			= $(COMMONFLAGS) $(INCLUDE) -std=c++20 -Wno-switch
 LDFLAGS				= -Wl,--gc-sections
 
+ifeq ($(OS),Windows_NT)
+@echo you can't build in this OS.
+
+else
+
 %.o: %.cc
 	@echo $(notdir $<)
 	@clang++ -MP -MMD -MF $*.d $(CXXFLAGS) -c -o $@ $<
@@ -60,3 +65,4 @@ $(OUTPUT): $(OFILES)
 
 endif
 
+endif
