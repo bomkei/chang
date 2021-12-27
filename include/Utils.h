@@ -20,6 +20,19 @@ namespace Utils {
     
     return s;
   }
+  
+  template <class T, class F>
+  bool compare_vector(std::vector<T> const& a, std::vector<T> const& b, F func) {
+    if( a.size() != b.size() )
+      return false;
+    
+    for( std::size_t i = 0; i < a.size(); i++ ) {
+      if( !func(a[i], b[i]) )
+        return false;
+    }
+
+    return true;
+  }
 
   class String {
     static inline std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> conv;
