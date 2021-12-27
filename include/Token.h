@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 enum TokenKind {
   TOK_INT,
   TOK_CHAR,
@@ -13,9 +15,9 @@ enum TokenKind {
 struct Token {
   TokenKind kind;
   std::string_view str;
+  std::size_t pos;
   Token* back;
   Token* next;
-  std::size_t pos;
   
   Token() { }
 

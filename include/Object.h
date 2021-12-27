@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <string_view>
+
 enum ObjectKind {
   OBJ_INT,
   OBJ_CHAR,
