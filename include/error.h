@@ -1,5 +1,7 @@
 #pragma once
 
+struct Token;
+
 enum ErrorKind {
   ERR_LEX,
   ERR_PARSE,

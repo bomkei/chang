@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Global.h"
+
 class Driver {
 public:
   Driver();

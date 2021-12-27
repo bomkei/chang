@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+
+struct Node;
+
 struct Global {
   std::string source;
   std::string file_path;
