@@ -1,4 +1,5 @@
-#include "BuiltinFunc.h
+#include <iostream>
+#include "BuiltinFunc.h"
 
 #define FUNC  [] (Args args) -> Object
 

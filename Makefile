@@ -1,9 +1,17 @@
 TARGET		= chang
 
+BUILD			= build
 INCLUDES	= include
 SOURCES		= src
-SUBDIRS		= Evaluater
-BUILD			= build
+SUBDIRS		= \
+	Builtin \
+	Debug \
+	Error \
+	Evaluater \
+	Interpreter \
+	Lexer \
+	Parser \
+	Types
 
 COMMONFLAGS		= -O2
 CXXFLAGS			= $(COMMONFLAGS) $(INCLUDE) -std=c++20 -Wno-switch

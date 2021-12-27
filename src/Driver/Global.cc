@@ -1,4 +1,4 @@
-#include "chang.h"
+#include "Global.h"
 
 static Global* _instance;
 

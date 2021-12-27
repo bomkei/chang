@@ -1,26 +1,6 @@
 #pragma once
 
-#include <concepts>
-#include <cassert>
-#include <codecvt>
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
 #include <string>
-#include <cstdlib>
-#include <cstring>
-#include <vector>
-#include <list>
-#include <locale>
-#include <map>
-
-#include "debug.h"
-#include "values.h"
-
-#include "utils.h"
-#include "token.h"
-#include "object.h"
-#include "node.h"
 
 class Lexer {
 public:

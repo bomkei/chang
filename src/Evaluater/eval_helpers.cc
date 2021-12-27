@@ -1,9 +1,9 @@
-#include "token.h"
-#include "object.h"
-#include "node.h"
 #include "error.h"
 #include "debug.h"
-#include "evaluater.h"
+#include "Token.h"
+#include "Object.h"
+#include "Node.h"
+#include "Evaluater.h"
 
 bool Evaluater::is_branchable(Node* node) {
   if( !node )
