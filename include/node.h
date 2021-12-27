@@ -1,3 +1,6 @@
+// yes, sure, already I know I'm an idiot. sorry. :)
+// but why do you say that, I think struct Node is better than some classes used many derives.
+
 #pragma once
 
 enum NodeKind {

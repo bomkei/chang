@@ -2,7 +2,7 @@ TARGET		= chang
 
 INCLUDES	= include
 SOURCES		= src
-SUBDIRS		=
+SUBDIRS		= Evaluater
 BUILD			= build
 
 COMMONFLAGS		= -O2

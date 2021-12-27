@@ -1,4 +1,10 @@
-#include "chang.h"
+#include "node.h"
+#include "evaluater.h"
+
+/*
+  todo: insert color before type name in error message
+
+*/
 
 static Evaluater* _instance;
 
@@ -27,6 +33,7 @@ bool Evaluater::is_lvalue(Node* node) {
 
   switch( node->kind ) {
     case NODE_VARIABLE:
+    case NODE_REFERENCE:
       return true;
   }
 
@@ -41,9 +48,13 @@ Object* Evaluater::get_obj_addr(Node* node) {
     case NODE_VARIABLE: {
       return &node->get_var();
     }
+
+    case NODE_REFERENCE: {
+      return get_obj_addr(node->expr);
+    }
   }
 
-  error(ERR_VALUE_TYPE, node->token, "please report to developer (code=0x9988ABAB)");
+  error(ERR_VALUE_TYPE, node->token, "please report to developer.(code=0x4gbs8j2k)");
   exit(1);
 }
 
@@ -74,103 +85,6 @@ void Evaluater::check_array(std::vector<Node*>::const_iterator ec_list_it, std::
       check_array(ec_list_it + 1, ec_obj_list_it + 1, depth - 1, i);
     }
   }
-}
-
-std::vector<Node*> Evaluater::get_return_values(Node* node) {
-  using Vec = std::vector<Node*>;
-
-  if( !node )
-    return { };
-
-  switch( node->kind ) {
-    case NODE_IF: {
-      Vec v;
-
-      for( auto&& i : get_return_values(node->if_true) ) {
-        v.emplace_back(i);
-      }
-
-      for( auto&& i : get_return_values(node->if_else) ) {
-        v.emplace_back(i);
-      }
-
-      return v;
-    }
-
-    case NODE_RETURN: {
-      return { node->expr };
-    }
-
-    case NODE_SCOPE: {
-      if( node->list.empty() ) {
-        return { };
-      }
-
-      Vec v;
-      Vec::const_iterator begin = node->list.end() - 1;
-
-      for( auto it = node->list.begin(); it != node->list.end(); it++ ) {
-        if( *it && (*it)->kind == NODE_RETURN ) {
-          begin = it;
-          break;
-        }
-      }
-
-      for( auto it = begin; it >= node->list.begin(); it-- ) {
-        for( auto&& i : get_return_values(*it) ) {
-          v.emplace_back(i);
-        }
-
-        if( !is_branchable(*it) ) {
-          break;
-        }
-        else { // keep this new line
-          if( (*it)->kind == NODE_IF && (*it)->if_else && (*it)->if_else->kind != NODE_IF ) {
-            break;
-          }
-        }
-      }
-
-      return v;
-    }
-
-    case NODE_FUNCTION: {
-      return get_return_values(node->expr);
-    }
-
-    case NODE_VAR:
-      return { };
-  }
-
-  return { node };
-}
-
-ObjectType Evaluater::must_integrated(Node* scope, std::vector<Node*> const& types) {
-  assert(scope->kind == NODE_SCOPE);
-
-  if( types.empty() ) {
-    return { };
-  }
-
-  auto const first = evaluate(types[0]);
-  auto const&& firststr = first.to_string();
-
-  if( types.size() <= 1 ) {
-    return first;
-  }
-
-  for( auto it = types.begin() + 1; it != types.end(); it++ ) {
-    auto&& eval = evaluate(*it);
-
-    if( !first.equals(eval) ) {
-      error(ERR_TYPE, scope->token, "all values which can be return value of scope are must be integrated by one type.");
-      error(ERR_NOTE, types[0]->token, "return type was inferred as '%s' here", firststr.c_str());
-      error(ERR_TYPE, (*it)->token, "expected '%s', but found '%s'", firststr.c_str(), eval.to_string().c_str());
-      exit(1);
-    }
-  }
-
-  return first;
 }
 
 std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {
@@ -246,6 +160,11 @@ ObjectType Evaluater::evaluate(Node* node) {
         node->var_index = index;
 
         node->scope_depth = node->get_var().scope_depth;
+
+        if( initialized.contains(&node->get_var()) && !initialized[&node->get_var()] ) {
+          error(ERR_UNINITIALIZED, node->token, "cannot use uninitialized variable");
+          exit(1);
+        }
 
         alert;
       #if __DEBUG__
@@ -337,6 +256,9 @@ ObjectType Evaluater::evaluate(Node* node) {
       }
 
       find_userdef = find_func(node->name, args);
+
+      // todo: check finely
+      // todo: add find_func_same_name()
 
       if( find_userdef.empty() ) {
         error(ERR_UNDEFINED, node->token, "undefined function");
@@ -548,6 +470,8 @@ ObjectType Evaluater::evaluate(Node* node) {
       obj.name = node->name;
       obj.scope_depth = cur->scope_depth;
 
+      initialized[&obj] = false;
+
       alert;
     #if __DEBUG__
       fprintf(stderr,"obj.scope_depth = %lu\n",obj.scope_depth);
@@ -558,12 +482,34 @@ ObjectType Evaluater::evaluate(Node* node) {
 
       auto specified_type = evaluate(node->type);
 
+      if( specified_type.reference || (node->expr && node->expr->kind == NODE_REFERENCE) ) {
+        if( !node->expr ) {
+          error(ERR_REFERENCE, node->token, "must have intiializer expression due to variable type was specified as reference");
+          exit(1);
+        }
+        else if( !is_lvalue(node->expr) ) {
+          error(ERR_VALUE_TYPE, node->expr->token, "initializer expression of reference is must lvalue");
+          exit(1);
+        }
+        
+        if( ++ref_counter[get_obj_addr(node->expr)] >= 2 ) {
+          error(ERR_REFERENCE, node->token, "cannot make two reference for same object");
+          exit(1);
+        }
+
+        node->get_var().type = specified_type;
+        node->get_var().type.reference = true;
+        node->get_var().address = get_obj_addr(node->expr);
+      }
+
       if( node->type ) {
+        //ObjectType expr_type;
+
         auto chk_type = node->expr != nullptr;
         obj.type = specified_type;
 
-        if( !chk_type && node->type->is_reference ) {
-          error(ERR_REFERENCE, node->token, "must have intiializer expression due to variable type was specified as reference");
+        if( node->expr && !specified_type.equals(evaluate(node->expr)) ) {
+          error(ERR_TYPE, node->token, "type mismatch");
           exit(1);
         }
 
@@ -607,7 +553,9 @@ ObjectType Evaluater::evaluate(Node* node) {
         obj.type = evaluate(node->expr);
       }
 
+      initialized[&obj] = true;
       var_stmt_list.pop_front();
+
       break;
     }
 
