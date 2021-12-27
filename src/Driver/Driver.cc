@@ -44,7 +44,6 @@ int Driver::main(int argc, char** argv) {
 
   Lexer lexer(global.source);
 
-  alert;
   auto tok = lexer.lex();
 
   if( global.is_error_occurred )
@@ -52,7 +51,6 @@ int Driver::main(int argc, char** argv) {
 
   Parser parser(tok);
 
-  alert;
   auto node = parser.parse();
 
   global.top_node = node;
@@ -62,7 +60,6 @@ int Driver::main(int argc, char** argv) {
 
   Evaluater eval;
 
-  alert;
   eval.evaluate(node);
 
   if( !global.entry_point ) {
@@ -84,7 +81,6 @@ int Driver::main(int argc, char** argv) {
     }
   }
 
-  alert;
   runner.run_node(global.entry_point->expr);
 
   return 0;

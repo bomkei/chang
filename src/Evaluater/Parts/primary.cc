@@ -29,14 +29,7 @@ ObjectType Evaluater::primary(Node* node) {
           exit(1);
         }
 
-        alert;
-      #if __DEBUG__
-        fprintf(stderr,"node->scope_depth = %lu\n",node->scope_depth);
-      #endif
-
-        //ret = scope->objects[index].type;
         ret = node->get_var().type;
-
         break;
       }
 
@@ -73,11 +66,6 @@ ObjectType Evaluater::primary(Node* node) {
       node->scope_depth = node->expr->scope_depth;
       node->obj.type = ret;
       node->obj.address = node->objptr = get_obj_addr(node->expr);
-
-      alert;
-    #if __DEBUG__
-      fprintf(stderr,"node->scope_depth = %lu\n",node->scope_depth);
-    #endif
 
       break;
     }

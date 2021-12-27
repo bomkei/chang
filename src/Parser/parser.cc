@@ -91,14 +91,6 @@ Node* Parser::expect_type() {
     expect(">");
   }
 
-
-debug(
-  alert;
-  for(auto&&i:node->elemcount_list){
-    fprintf(stderr,"(node->elemcount_list) i=%p\n",i);
-  }
-)
-
   while( consume("[") ) {
     if( consume("]") ) {
       node->elemcount_list.emplace_back(nullptr);
@@ -109,15 +101,7 @@ debug(
     }
   }
 
-debug(
-  alert;
-  for(auto&&i:node->elemcount_list){
-    fprintf(stderr,"(node->elemcount_list) i=%p\n",i);
-  }
-)
-
   if( consume("&") ) {
-    alert;
     node->is_reference = true;
   }
 
@@ -134,7 +118,6 @@ bool Parser::is_need_semicolon(Node* node) {
 }
 
 Node* Parser::primary() {
-
   if( consume("(") ) {
     auto e = expr();
     expect(")");

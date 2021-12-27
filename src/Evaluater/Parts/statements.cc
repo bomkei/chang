@@ -54,11 +54,6 @@ ObjectType Evaluater::stmt(Node* node) {
         for( auto&& i : ret_nodes ) {
           auto&& e = evaluate(i);
 
-          alert;
-        #if __DEBUG__
-          fprintf(stderr,"%lu %lu\n",node->scope_depth,i->scope_depth);
-        #endif
-
           if( e.reference && node->scope_depth <= i->scope_depth ) {
             error(ERR_LIFE_SPAN, i->token, "this is cannot be take out and use from scope");
           }
@@ -94,11 +89,6 @@ ObjectType Evaluater::stmt(Node* node) {
 
       initialized[&obj] = false;
 
-      alert;
-    #if __DEBUG__
-      fprintf(stderr,"obj.scope_depth = %lu\n",obj.scope_depth);
-    #endif
-
       node->var_scope = cur;
       node->var_index = cur->objects.size() - 1;
 
@@ -130,8 +120,6 @@ ObjectType Evaluater::stmt(Node* node) {
       }
 
       if( node->type ) {
-        //ObjectType expr_type;
-
         auto chk_type = node->expr != nullptr;
         obj.type = specified_type;
 
@@ -168,6 +156,7 @@ ObjectType Evaluater::stmt(Node* node) {
             }
 
             var_stmt_list.pop_front();
+            initialized[&obj] = true;
             break;
           }
         }
@@ -182,7 +171,6 @@ ObjectType Evaluater::stmt(Node* node) {
 
       initialized[&obj] = true;
       var_stmt_list.pop_front();
-
       break;
     }
 
