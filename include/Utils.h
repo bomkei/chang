@@ -60,6 +60,10 @@ namespace Utils {
     static std::u16string to_utf16(std::string_view const& str) {
       return conv.from_bytes(std::string(str.cbegin(), str.length()));
     }
+
+    static std::u16string to_utf16(char const* str) {
+      return conv.from_bytes(str);
+    }
   };
 }
 

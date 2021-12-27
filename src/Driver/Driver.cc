@@ -6,6 +6,7 @@
 #include "Node.h"
 #include "Driver.h"
 #include "Global.h"
+#include "Utils.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Evaluater.h"
@@ -74,6 +75,15 @@ int Driver::main(int argc, char** argv) {
 
   Interpreter runner;
   
+  if( !global.entry_point->expr->objects.empty() ) {
+    for( int i = 1; i < argc; i++ ) {
+      auto& arg = global.entry_point->expr->objects[0].list.emplace_back();
+
+      arg.type = OBJ_STRING;
+      arg.v_str = Utils::String::to_utf16(argv[i]);
+    }
+  }
+
   alert;
   runner.run_node(global.entry_point->expr);
 
