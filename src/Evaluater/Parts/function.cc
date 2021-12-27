@@ -19,7 +19,17 @@ ObjectType Evaluater::func(Node* node) {
     obj.scope_depth = scope_depth;
   }
 
-  if( in_main && 
+  if( in_main ) {
+    if(
+      !node->expr->objects.empty() &&
+      !Utils::compare_vector<ObjectType>(Utils::extract_from_vec<ObjectType>(node->expr->objects, [](auto&x){return x.type;}),
+        std::vector<ObjectType>{ ({ ObjectType t = OBJ_STRING; t.arr_depth = 1; t; }) }, [](auto&a,auto&b){return a.equals(b);}
+      )
+    ) {
+      errortext("In special function 'main'");
+      error(ERR_MAIN_FUNC, node->token, "arguments are must empty, or <string[]>");
+    }
+  }
 
   auto func_type = evaluate(node->type);
   auto eval = evaluate(node->expr);

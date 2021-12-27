@@ -34,6 +34,17 @@ namespace Utils {
     return true;
   }
 
+  template <class U, class T, class F>
+  auto extract_from_vec(std::vector<T> const& a, F func) {
+    std::vector<U> ret;
+
+    for( auto&& i : a ) {
+      ret.emplace_back(func(i));
+    }
+
+    return ret;
+  }
+
   class String {
     static inline std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> conv;
 
