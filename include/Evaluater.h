@@ -8,6 +8,10 @@ class Evaluater {
 public:
   Evaluater();
 
+  ObjectType primary(Node* node);
+  ObjectType expr(Node* node);
+  ObjectType stmt(Node* node);
+
   ObjectType evaluate(Node* node);
 
   static Evaluater* get_instance();

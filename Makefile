@@ -8,6 +8,7 @@ SUBDIRS		= \
 	Debug \
 	Error \
 	Evaluater \
+	Evaluater/Parts \
 	Interpreter \
 	Lexer \
 	Parser \
