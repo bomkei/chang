@@ -6,14 +6,7 @@
 #include "Evaluater.h"
 
 ObjectType Evaluater::primary(Node* node) {
-  if( !node )
-    return { };
-
-  if( node->evaluated )
-    return node->objtype;
-
   auto& ret = node->objtype;
-  node->evaluated = true;
 
   switch( node->kind ) {
     case NODE_VALUE:
@@ -173,6 +166,10 @@ ObjectType Evaluater::primary(Node* node) {
 
       break;
     }
+
+    case NODE_ARGUMENT:
+      ret = evaluate(node->type);
+      break;
   }
 
   return { };

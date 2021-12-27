@@ -5,21 +5,41 @@
 #include "Node.h"
 #include "Evaluater.h"
 
-ObjectType Evaluater::evaluate(Node* node) {
-  if( !node )
-    return { };
-
-  if( node->evaluated )
-    return node->objtype;
-
+ObjectType Evaluater::expr(Node* node) {
   auto& ret = node->objtype;
-  node->evaluated = true;
 
   switch( node->kind ) {
-    case NODE_VALUE:
-    case NODE_VARIABLE:
-    case NODE_CALLFUNC:
-      return primary(node);
+    case NODE_ASSIGN: {
+      if( !is_lvalue(node->expr) ) {
+        error(ERR_VALUE_TYPE, node->expr->token, "expression is must lvalue");
+      }
+
+      ret = evaluate(node->expr);
+
+      for( auto&& i : node->list ) {
+        if( i != *node->list.rbegin() && !is_lvalue(i) ) {
+          error(ERR_VALUE_TYPE, i->token, "expression is must lvalue");
+        }
+
+        if( !ret.equals(evaluate(i)) ) {
+          error(ERR_TYPE, i->token, "type mismatch");
+        }
+      }
+
+      break;
+    }
+
+    case NODE_EXPR: {
+      ret = evaluate(node->expr);
+
+      for( auto&& item : node->expr_list ) {
+        if( !ret.equals(evaluate(item.item)) ) {
+          error(ERR_TYPE, item.token, "type mismatch");
+        }
+      }
+
+      break;
+    }
   }
 
   return { };
