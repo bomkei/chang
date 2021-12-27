@@ -94,6 +94,7 @@ Object& Interpreter::run_lvalue(Node* node) {
   error(ERR_TYPE, node->token,
     "omg this is not a lvalue, but why you can see this error?"
     PLEASE_REPORT "9oGb83NNmwx");
+  exit(1);
 }
 
 Object Interpreter::run_node(Node* node) {
