@@ -1,6 +1,7 @@
 #pragma once
 
 #include <codecvt>
+#include <cstring>
 #include <locale>
 #include <string>
 #include <vector>

@@ -6,6 +6,7 @@ SOURCES		= src
 SUBDIRS		= \
 	Builtin \
 	Debug \
+	Driver \
 	Error \
 	Evaluater \
 	Evaluater/Parts \

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "debug.h"
 #include "Token.h"
 #include "Object.h"

@@ -1,5 +1,6 @@
 #include "error.h"
 #include "debug.h"
+#include "Utils.h"
 #include "Token.h"
 #include "Object.h"
 #include "Node.h"
@@ -62,7 +63,7 @@ ObjectType Evaluater::evaluate(Node* node) {
 
         if( !func_type.equals(e) ) {
           if( !err ) {
-            std::cout << Global::get_instance()->file_path << ": In function '" << node->name << "'" << std::endl;
+            errortext("In function", Utils::str(node->name));
             err = true;
           }
 

@@ -1,11 +1,21 @@
 #include <cstdarg>
 #include "error.h"
 #include "values.h"
+#include "Token.h"
 #include "Driver.h"
 
-void error(ErrorKind kind, Token* token, char const* fmt, ...) {
-  static char buf[0x1000];
+static char buf[0x1000];
 
+void errortext(char const* fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  vsprintf(buf, fmt, ap);
+  va_end(ap);
+
+  printf(COL_WHITE "%s: %s\n", buf);
+}
+
+void error(ErrorKind kind, Token* token, char const* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
   vsprintf(buf, fmt, ap);

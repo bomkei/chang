@@ -1,5 +1,4 @@
-#include <string>
-#include "object.h"
+#include "Object.h"
 
 bool ObjectType::equals(ObjectType const& type) const {
   if( kind == type.kind ) {

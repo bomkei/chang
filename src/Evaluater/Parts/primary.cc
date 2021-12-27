@@ -1,8 +1,10 @@
 #include "error.h"
 #include "debug.h"
+#include "Utils.h"
 #include "Token.h"
 #include "Object.h"
 #include "Node.h"
+#include "BuiltinFunc.h"
 #include "Evaluater.h"
 
 ObjectType Evaluater::primary(Node* node) {
@@ -140,7 +142,7 @@ ObjectType Evaluater::primary(Node* node) {
         }
       }
       else if( find_userdef.size() > 1 ) {
-        error(ERR_MANY_CANDIDATES, node->token, "found many candidates with this name");
+        error(ERR_CANDIDATES, node->token, "found many candidates with this name");
 
         for( auto&& i : find_userdef ) {
           error(ERR_NOTE, i->token, "got this");

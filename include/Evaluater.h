@@ -9,6 +9,7 @@ public:
   Evaluater();
 
   ObjectType primary(Node* node);
+  ObjectType type(Node* node);
   ObjectType expr(Node* node);
   ObjectType stmt(Node* node);
 

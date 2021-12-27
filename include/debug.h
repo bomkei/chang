@@ -1,13 +1,13 @@
 #pragma once
 
+#include <cassert>
+#include <cstdio>
+
 #define  __DEBUG__  0
 
 #define  PLEASE_REPORT  "please report to developer with your script file and this code: "
 
 #if __DEBUG__
-  #include <cassert>
-  #include <cstdio>
-  
   #define alert fprintf(stderr,"\t#alert at %s:%d\n",__FILE__,__LINE__)
   #define debug(...) __VA_ARGS__
   #define dbgprint(...) {fprintf(stderr,__VA_ARGS__);fflush(stderr);}

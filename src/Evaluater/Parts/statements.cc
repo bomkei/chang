@@ -4,6 +4,7 @@
 #include "Object.h"
 #include "Node.h"
 #include "Evaluater.h"
+#include "Global.h"
 
 ObjectType Evaluater::stmt(Node* node) {
   auto& ret = node->objtype;

@@ -23,4 +23,5 @@ enum ErrorKind {
   ERR_NOTE
 };
 
+void errortext(char const* fmt, ...);
 void error(ErrorKind kind, Token* token, char const* fmt, ...);

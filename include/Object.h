@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <string_view>
+#include <string>
 
 enum ObjectKind {
   OBJ_INT,

@@ -1,4 +1,7 @@
-#include "chang.h"
+#include "error.h"
+#include "debug.h"
+#include "Token.h"
+#include "Lexer.h"
 
 static char const* reserved_tokens[] = {
   "continue",
