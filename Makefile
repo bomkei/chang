@@ -16,7 +16,7 @@ SUBDIRS		= \
 	Types
 
 COMMONFLAGS		= -O2
-CXXFLAGS			= $(COMMONFLAGS) $(INCLUDE) -std=c++20 -Wno-switch
+CXXFLAGS			= $(COMMONFLAGS) $(INCLUDE) -std=c++20
 LDFLAGS				= -Wl,--gc-sections
 
 ifeq ($(OS),Windows_NT)

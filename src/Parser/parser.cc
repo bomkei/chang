@@ -281,8 +281,19 @@ unk:;
   exit(1);
 }
 
-Node* Parser::member() {
+Node* Parser::indexref() {
   auto node = primary();
+
+  while( consume("[") ) {
+    node = new Node(NODE_INDEX_REF, node, expr(), consumed);
+    expect("]");
+  }
+
+  return node;
+}
+
+Node* Parser::member() {
+  auto node = indexref();
 
   while( consume(".") ) {
     auto x = primary();
@@ -292,13 +303,8 @@ Node* Parser::member() {
       node = x;
     }
     else {
-      //x = new Node(NODE_MEMBER_ACCESS, node, x, consumed);
-      auto y = new Node(NODE_MEMBER_ACCESS);
-      
-      y->item = node;
-      y->member = x;
-
-      x = y;
+      x = new Node(NODE_MEMBER_ACCESS, node, x, consumed);
+      node = x;
     }
   }
 
@@ -429,8 +435,6 @@ Node* Parser::expr() {
 
     node->token = consumed;
     node->expr = expr();
-
-    assert(node->expr);
 
     return node;
   }

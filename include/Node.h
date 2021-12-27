@@ -101,8 +101,8 @@ struct Node {
   bool is_allowed_empty_array;
   bool is_allowed_return;
 
-  Node* item = nullptr;
-  Node* member;
+  Node* lhs = nullptr;
+  Node* rhs = nullptr;
 
   Node* func = nullptr;
   BuiltinFunc const* builtin;
@@ -135,5 +135,9 @@ struct Node {
 
   Node(NodeKind kind)
     : kind(kind) {
+  }
+
+  Node(NodeKind kind, Node* lhs, Node* rhs, Token* token = nullptr)
+    : kind(kind), lhs(lhs), rhs(rhs), token(token) {
   }
 };

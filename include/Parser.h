@@ -12,6 +12,7 @@ public:
   Node* parse();
 
   Node* primary();
+  Node* indexref();
   Node* member();
   Node* unary();
   Node* mul();
