@@ -20,6 +20,7 @@ enum ErrorKind {
   ERR_MAIN_FUNC,
   ERR_LOCATION,
   ERR_ARGUMENT,
+  ERR_OUT_OF_RANGE,
   ERR_WARN,
   ERR_NOTE
 };

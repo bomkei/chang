@@ -110,6 +110,17 @@ Object Interpreter::run_node(Node* node) {
     case NODE_VARIABLE:
       return run_lvalue(node);
 
+    case NODE_INDEX_REF: {
+      auto obj = run_node(node->lhs);
+      auto index = run_node(node->rhs).v_int;
+
+      if( index < 0 || index >= obj.list.size() ) {
+        error(ERR_OUT_OF_RANGE, node->token, "subscript out of range");
+      }
+
+      return obj.list[index];
+    }
+
     case NODE_CALLFUNC: {
       std::vector<Object> args;
       std::vector<Object> save;

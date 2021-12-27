@@ -3,7 +3,7 @@
 #include <cassert>
 #include <cstdio>
 
-#define  __DEBUG__  0
+#define  __DEBUG__  1
 
 #define  PLEASE_REPORT  "please report to developer with your script file and this code: "
 

@@ -91,6 +91,14 @@ Node* Parser::expect_type() {
     expect(">");
   }
 
+
+debug(
+  alert;
+  for(auto&&i:node->elemcount_list){
+    fprintf(stderr,"(node->elemcount_list) i=%p\n",i);
+  }
+)
+
   while( consume("[") ) {
     if( consume("]") ) {
       node->elemcount_list.emplace_back(nullptr);
@@ -100,6 +108,13 @@ Node* Parser::expect_type() {
       expect("]");
     }
   }
+
+debug(
+  alert;
+  for(auto&&i:node->elemcount_list){
+    fprintf(stderr,"(node->elemcount_list) i=%p\n",i);
+  }
+)
 
   if( consume("&") ) {
     alert;
@@ -485,9 +500,7 @@ Node* Parser::top() {
     if( is_main ) {
       auto zero = Global::get_instance()->main_zero = node->expr->list.emplace_back(new Node(NODE_VALUE));
 
-      zero->token = token->back;
-      assert(token->back->str == "}");
-
+      zero->token = node->token;
       zero->obj.type = OBJ_INT;
     }
 

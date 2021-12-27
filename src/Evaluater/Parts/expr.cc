@@ -42,5 +42,5 @@ ObjectType Evaluater::expr(Node* node) {
     }
   }
 
-  return { };
+  return ret;
 }

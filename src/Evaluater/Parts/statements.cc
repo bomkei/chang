@@ -211,5 +211,5 @@ ObjectType Evaluater::stmt(Node* node) {
     }
   }
 
-  return { };
+  return ret;
 }

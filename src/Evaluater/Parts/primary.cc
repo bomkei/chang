@@ -44,6 +44,21 @@ ObjectType Evaluater::primary(Node* node) {
       exit(1);
     }
 
+    case NODE_INDEX_REF: {
+      ret = evaluate(node->lhs);
+
+      if( ret.arr_depth == 0 ) {
+        error(ERR_TYPE, node->token, "left side is must array type");
+      }
+
+      if( !evaluate(node->rhs).equals(OBJ_INT) ) {
+        error(ERR_TYPE, node->rhs->token, "index is must integer");
+      }
+
+      ret.arr_depth--;
+      break;
+    }
+
     case NODE_REFERENCE: {
       if( !is_lvalue(node->expr) ) {
         error(ERR_VALUE_TYPE, node->expr->token, "expression is must lvalue");
@@ -174,5 +189,5 @@ ObjectType Evaluater::primary(Node* node) {
       break;
   }
 
-  return { };
+  return ret;
 }
