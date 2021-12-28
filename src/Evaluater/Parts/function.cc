@@ -22,7 +22,7 @@ ObjectType Evaluater::func(Node* node) {
   if( in_main ) {
     if( !node->expr->objects.empty() &&
       !(node->expr->objects.size() == 1 && node->expr->objects[0].type.equals(({ ObjectType t = OBJ_STRING; t.arr_depth = 1; t; }))) ) {
-      error(ERR_MAIN_FUNC, node->token, "arguments of 'main' function are must empty, or string[]");
+      error(ERR_MAIN_FUNC, node->token, "arguments of 'main' function are must empty, or 'string[]'");
     }
   }
 
