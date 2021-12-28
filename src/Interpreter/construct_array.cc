@@ -20,9 +20,8 @@ Object Interpreter::construct_array(ObjectKind kind, Interpreter::EcObjIt end, I
     if( ++it == end )
       break;
 
-    elem = obj;
-    obj.type.arr_depth++;
-    obj.list.clear();
+    elem = std::move(obj);
+    (obj.type = elem.type).arr_depth++;
   }
 
   return obj;

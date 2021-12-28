@@ -25,6 +25,16 @@ namespace Utils {
     
     return s;
   }
+
+  inline std::string repeat_str(std::string const& s, std::size_t n) {
+    std::string ret = s;
+
+    for( std::size_t i = 1; i < n; i++ ) {
+      ret += s;
+    }
+
+    return s;
+  }
   
   template <class T, class F>
   bool compare_vector(std::vector<T> const& a, std::vector<T> const& b, F func) {

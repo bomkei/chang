@@ -3,6 +3,7 @@
 #include "Token.h"
 #include "Object.h"
 #include "Node.h"
+#include "Utils.h"
 #include "BuiltinFunc.h"
 #include "Interpreter.h"
 
@@ -36,8 +37,9 @@ Object Interpreter::run_stmt(Node* node) {
       }
 
       if( !node->expr ) {
-        if( node->is_make_array )
+        if( node->is_make_array ) {
           node->get_var() = construct_array(node->type->objtype.kind, node->objects.rend(), node->objects.rbegin());
+        }
       }
       else {
         node->get_var() = run_node(node->expr);

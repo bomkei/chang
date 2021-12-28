@@ -31,11 +31,6 @@ struct ObjectType {
   std::string to_string() const;
 };
 
-/*
-  todo: impl these
-    Object(const&);
-    Object(&&);
-*/
 struct Object {
   ObjectType type;
   std::string_view name;
@@ -52,8 +47,12 @@ struct Object {
   std::u16string v_str;
   std::vector<Object> list;
 
+  Object() { }
   Object(Object&&);
   Object(Object const&) = default;
+
+  Object& operator = (Object&&);
+  Object& operator = (Object const&) = default;
 
   bool equals(Object const&) const;
   std::string to_string() const;

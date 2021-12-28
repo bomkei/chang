@@ -3,6 +3,7 @@
 #include "Token.h"
 #include "Object.h"
 #include "Node.h"
+#include "Utils.h"
 #include "Evaluater.h"
 #include "Global.h"
 
@@ -132,15 +133,22 @@ ObjectType Evaluater::stmt(Node* node) {
           auto flag = false;
           auto empty_specified = false;
 
+          node->is_make_array = true;
+
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
             if( *it == nullptr ) {
               if( !flag ) {
                 flag = true;
               }
+              else if( !node->expr ) {
+                obj.type.arr_depth = node->type->elemcount_list.end() - it;
+                error(ERR_WARN, node->token, "array will be initialized to '%s'", obj.type.to_string().c_str());
+              }
             }
             else if( flag ) {
               error(ERR_TYPE, (*it)->token, "cannot specify elements count of array in this depth, due to not specified previous depth.");
 
+              assert((*it)->token);
               assert((*it)->token->back);
               assert((*it)->token->back->back);
               assert((*it)->token->back->back->back);
