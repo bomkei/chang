@@ -143,6 +143,8 @@ ObjectType Evaluater::primary(Node* node) {
             error(ERR_NOTE, i->token, "got this");
           }
         }
+
+        exit(1);
       }
       else if( find_userdef.size() > 1 ) {
         error(ERR_CANDIDATES, node->token, "found many candidates with this name");
@@ -156,7 +158,6 @@ ObjectType Evaluater::primary(Node* node) {
 
       ret = evaluate(fn->expr);
       node->func = fn;
-
       break;
 
     check_process:;
