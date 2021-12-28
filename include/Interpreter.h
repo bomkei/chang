@@ -12,6 +12,8 @@ class Interpreter {
 public:
   Interpreter();
 
+  void expr_obj(ExprKind kind, Object& a, Object& b);
+
   Object run_primary(Node* node);
   Object run_expr(Node* node);
   Object run_stmt(Node* node);
@@ -20,7 +22,6 @@ public:
   Object& run_lvalue(Node* node);
 
   Object construct_array(ObjectKind kind, EcObjIt end, EcObjIt it);
-  void fit_array_length(std::vector<Object>::const_iterator const& ec_obj_it, Object& arr);
 
   static Interpreter* get_instance();
 

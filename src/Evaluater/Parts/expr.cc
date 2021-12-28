@@ -30,11 +30,32 @@ ObjectType Evaluater::expr(Node* node) {
     }
 
     case NODE_EXPR: {
-      ret = evaluate(node->expr);
+      auto first = evaluate(node->expr_list[0].item);
 
-      for( auto&& item : node->expr_list ) {
-        if( !ret.equals(evaluate(item.item)) ) {
+      if( node->is_single() ) {
+        return first;
+      }
+
+      for( auto it = node->expr_list.begin() + 1; it != node->expr_list.end(); it++ ) {
+        auto& item = *it;
+        auto type = evaluate(item.item);
+
+        if( !type.equals(first) ) {
           error(ERR_TYPE, item.token, "type mismatch");
+        }
+
+        switch( type.kind ) {
+          case OBJ_STRING: {
+            switch( item.kind ) {
+              case EXPR_ADD:
+                break;
+              
+              default: {
+                error(ERR_OPERATOR, item.token, "invalid operator for '%s'", type.to_string().c_str());
+                exit(1);
+              }
+            }
+          }
         }
       }
 

@@ -27,6 +27,11 @@ struct ObjectType {
   std::string to_string() const;
 };
 
+/*
+  todo: impl these
+    Object(const&);
+    Object(&&);
+*/
 struct Object {
   ObjectType type;
   std::string_view name;

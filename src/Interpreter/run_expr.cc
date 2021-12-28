@@ -17,28 +17,19 @@ Object Interpreter::run_expr(Node* node) {
     }
 
     case NODE_EXPR: {
-      auto obj = run_node(node->expr);
+      auto obj = run_node(node->expr_list[0].item);
 
-      for( auto&& pair : node->expr_list ) {
-        auto&& item = run_node(pair.item);
+      if( node->is_single() ) {
+        return obj;
+      }
 
-        switch( pair.kind ) {
-          case EXPR_ADD:
-            Interpreter::add(obj, item);
-            break;
+      for( auto it = node->expr_list.begin() + 1; it != node->expr_list.end(); it++ ) {
+        auto& pair = *it;
+        auto item = run_node(pair.item);
 
-          case EXPR_SUB:
-            Interpreter::sub(obj, item);
-            break;
+        Interpreter::expr_obj(pair.kind, obj, item);
 
-          case EXPR_MUL:
-            Interpreter::mul(obj, item);
-            break;
-
-          case EXPR_DIV:
-            Interpreter::div(obj, item);
-            break;
-        }
+        obj = std::move(item);
       }
 
       return obj;
