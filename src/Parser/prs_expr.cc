@@ -26,7 +26,7 @@ Node* Parser::mul() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, unary() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::add() {
@@ -48,7 +48,7 @@ Node* Parser::add() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, primary() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::shift() {
@@ -70,7 +70,7 @@ Node* Parser::shift() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, add() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::spaceship() {
@@ -90,7 +90,7 @@ Node* Parser::spaceship() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, shift() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::compare() {
@@ -116,7 +116,7 @@ Node* Parser::compare() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, spaceship() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::equalty() {
@@ -138,7 +138,7 @@ Node* Parser::equalty() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, compare() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::bit_and() {
@@ -158,7 +158,7 @@ Node* Parser::bit_and() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, equalty() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::bit_xor() {
@@ -178,7 +178,7 @@ Node* Parser::bit_xor() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, bit_and() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::bit_or() {
@@ -198,7 +198,7 @@ Node* Parser::bit_or() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, bit_xor() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::log_and() {
@@ -218,7 +218,7 @@ Node* Parser::log_and() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, bit_or() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::log_or() {
@@ -238,7 +238,7 @@ Node* Parser::log_or() {
     expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, log_and() });
   }
 
-  return expr;
+  return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
 Node* Parser::assign() {

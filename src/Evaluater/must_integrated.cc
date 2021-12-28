@@ -26,6 +26,14 @@ ObjectType Evaluater::must_integrated(Node* scope, std::vector<Node*> const& typ
       error(ERR_TYPE, scope->token, "all values which can be return value of scope are must be integrated by one type.");
       error(ERR_NOTE, types[0]->token, "return type was inferred as '%s' here", firststr.c_str());
       error(ERR_TYPE, (*it)->token, "expected '%s', but found '%s'", firststr.c_str(), eval.to_string().c_str());
+
+      auto tok = (*it)->token;
+      auto const& str = tok->str;
+
+      if( str == "if" ) {
+        error(ERR_NOTE, tok, "maybe did you forget append else statement ?");
+      }
+
       exit(1);
     }
   }

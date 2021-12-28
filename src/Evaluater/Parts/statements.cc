@@ -183,14 +183,17 @@ ObjectType Evaluater::stmt(Node* node) {
         error(ERR_TYPE, node->token, "condition is must boolean");
       }
 
-      ret = evaluate(node->if_true);
-
       if( node->if_else ) {
+        ret = evaluate(node->if_true);
+
         if( !ret.equals(evaluate(node->if_else)) ) {
           error(ERR_TYPE, node->token, "type mismatch");
         }
-      }
 
+        return ret;
+      }
+      
+      evaluate(node->if_true);
       break;
     }
 

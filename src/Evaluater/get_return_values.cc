@@ -5,6 +5,13 @@
 #include "Node.h"
 #include "Evaluater.h"
 
+template <class T>
+void append_all(std::vector<T>& a, std::vector<T> const& b) {
+  for( auto&& i : b ) {
+    a.emplace_back(i);
+  }
+}
+
 std::vector<Node*> Evaluater::get_return_values(Node* node) {
   using Vec = std::vector<Node*>;
 
@@ -15,12 +22,11 @@ std::vector<Node*> Evaluater::get_return_values(Node* node) {
     case NODE_IF: {
       Vec v;
 
-      for( auto&& i : get_return_values(node->if_true) ) {
-        v.emplace_back(i);
-      }
+      append_all(v, get_return_values(node->if_true));
+      append_all(v, get_return_values(node->if_else));
 
-      for( auto&& i : get_return_values(node->if_else) ) {
-        v.emplace_back(i);
+      if( !node->if_else ) {
+        v.emplace_back(new Node(NODE_VALUE))->token = node->token;
       }
 
       return v;

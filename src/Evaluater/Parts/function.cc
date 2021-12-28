@@ -20,14 +20,9 @@ ObjectType Evaluater::func(Node* node) {
   }
 
   if( in_main ) {
-    if(
-      !node->expr->objects.empty() &&
-      !Utils::compare_vector<ObjectType>(Utils::extract_from_vec<ObjectType>(node->expr->objects, [](auto&x){return x.type;}),
-        std::vector<ObjectType>{ ({ ObjectType t = OBJ_STRING; t.arr_depth = 1; t; }) }, [](auto&a,auto&b){return a.equals(b);}
-      )
-    ) {
-      errortext("In special function 'main'");
-      error(ERR_MAIN_FUNC, node->token, "arguments are must empty, or string[]");
+    if( !node->expr->objects.empty() &&
+      !(node->expr->objects.size() == 1 && node->expr->objects[0].type.equals(({ ObjectType t = OBJ_STRING; t.arr_depth = 1; t; }))) ) {
+      error(ERR_MAIN_FUNC, node->token, "arguments of 'main' function are must empty, or string[]");
     }
   }
 
@@ -35,30 +30,21 @@ ObjectType Evaluater::func(Node* node) {
   auto eval = evaluate(node->expr);
 
   auto list = get_return_values(node->expr);
+  auto scope_type = must_integrated(node->expr, list);
   auto err = false;
 
   if( list.empty() && !func_type.equals(OBJ_NONE) ) {
     error(ERR_TYPE, node->token, "return type is not none, but function will return nothing.");
   }
 
-  for( auto&& i : list ) {
-    auto&& e = evaluate(i);
-
-    if( !func_type.equals(e) ) {
-      if( !err ) {
-        errortext("In function", Utils::str(node->name));
-        err = true;
-      }
-
-      error(ERR_TYPE, i->token, "expected '%s', but found '%s'", func_type.to_string().c_str(), e.to_string().c_str());
+  if( in_main ) {
+    if( !scope_type.equals(OBJ_INT) && !scope_type.equals(OBJ_NONE) ) {
+      error(ERR_TYPE, node->expr->token, "code of main is must return int or nothing");
     }
   }
-
-  if( err ) {
-    error(
-      ERR_NOTE, node->type ? node->type->token : node->token,
-      "specified with '%s' here", node->type ? Utils::str(node->type->name) : "int"
-    );
+  else if( !func_type.equals(scope_type) ) {
+    error(ERR_TYPE, node->expr->token, "type mismatch");
+    error(ERR_NOTE, node->type->token, "specified '%s', but code will return '%s'", func_type.to_string().c_str(), scope_type.to_string().c_str());
   }
 
   in_main = false;

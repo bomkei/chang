@@ -34,6 +34,9 @@ void Parser::expect(char const* str, bool step) {
 
 void Parser::expect_ident() {
   if( token->kind != TOK_IDENT ) {
+    if( isalpha(token->str[0]) || token->str[0] == '_' )
+      return;
+
     error(ERR_EXPECTED, token, "expected identifier");
     exit(1);
   }

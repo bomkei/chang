@@ -53,7 +53,7 @@ void error(ErrorKind kind, Token* token, char const* fmt, ...) {
   printf("%6lu | %s\n",
     line, src.substr(line_begin, line_end - line_begin).c_str());
 
-  printf("       | %s^%s\n\n",
+  printf("       | %s" COL_YELLOW "%s" COL_DEFAULT "\n\n",
     std::string(token->pos - line_begin, ' ').c_str(),
-    std::string(token->str.length() ? token->str.length() - 1 : 0, '~').c_str());
+    std::string(token->str.length(), '^').c_str());
 }
