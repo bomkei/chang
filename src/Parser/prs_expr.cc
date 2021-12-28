@@ -33,7 +33,7 @@ Node* Parser::add() {
   auto expr = new Node(NODE_EXPR);
 
   expr->token = token;
-  expr->first_expr(primary());
+  expr->first_expr(mul());
 
   while( check() ) {
     ExprKind kind;
@@ -45,7 +45,7 @@ Node* Parser::add() {
     else
       break;
 
-    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, primary() });
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, mul() });
   }
 
   return expr->is_single() ? expr->expr_list[0].item : expr;

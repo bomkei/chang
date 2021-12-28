@@ -23,6 +23,10 @@ struct ObjectType {
     : kind(kind) {
   }
 
+  ObjectType(ObjectKind kind, std::size_t arr_depth)
+    : kind(kind), arr_depth(arr_depth) {
+  }
+
   bool equals(ObjectType const&) const;
   std::string to_string() const;
 };
@@ -48,5 +52,9 @@ struct Object {
   std::u16string v_str;
   std::vector<Object> list;
 
+  Object(Object&&);
+  Object(Object const&) = default;
+
+  bool equals(Object const&) const;
   std::string to_string() const;
 };

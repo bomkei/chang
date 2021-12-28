@@ -1,6 +1,36 @@
 #include "Object.h"
 #include "Utils.h"
 
+Object::Object(Object&& obj)
+  : type(std::move(obj.type)),
+    name(obj.name),
+    scope_depth(obj.scope_depth),
+    v_int(obj.v_int),
+    v_str(std::move(obj.v_str)),
+    list(std::move(obj.list))
+{
+}
+
+bool Object::equals(Object const& obj) const {
+  if( !type.equals(obj.type) )
+    return false;
+
+  if( type.reference ) {
+    return address->equals(obj);
+  }
+
+  if( type.arr_depth ) {
+    if( list.size() != obj.list.size() )
+      return false;
+    
+    for( std::size_t i = 0; i < list.size(); i++ ) {
+      if( !list[i].equals(obj.list[i]) ) {
+        
+      }
+    }
+  }
+}
+
 std::string Object::to_string() const {
   if( type.reference ) {
     return address->to_string();
