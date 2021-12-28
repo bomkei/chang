@@ -7,7 +7,7 @@
 #include "Interpreter.h"
 
 void Interpreter::expr_obj(ExprKind kind, Object& a, Object& b) {
-  register auto const kk = a.type.kind;
+  auto const kk = a.type.kind;
 
   if( a.type.arr_depth ) {
     for( auto&& i : b.list ) {

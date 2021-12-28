@@ -9,6 +9,8 @@
 ObjectType Evaluater::compare(Node* node) {
   auto& ret = node->objtype;
 
+  ret = evaluate(node->expr_list[0].item);
+
   if( !ret.equals(OBJ_INT) && !ret.equals(OBJ_FLOAT) ) {
     error(ERR_TYPE, node->token, "invalid operator");
     exit(1);
@@ -21,5 +23,5 @@ ObjectType Evaluater::compare(Node* node) {
     }
   }
 
-  return ret;
+  return OBJ_BOOL;
 }

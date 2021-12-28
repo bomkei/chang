@@ -41,8 +41,9 @@ Object Interpreter::run_expr(Node* node) {
       for( auto it = node->expr_list.begin() + 1; it != node->expr_list.end(); it++ ) {
         auto&& x = run_node(it->item);
 
-        if( !compare_obj(obj, x) )
+        if( !compare_obj(it->kind, obj, x) ) {
           goto cmp_failure;
+        }
         
         obj = std::move(x);
       }

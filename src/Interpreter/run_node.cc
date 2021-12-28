@@ -22,6 +22,7 @@ Object Interpreter::run_node(Node* node) {
 
     case NODE_ASSIGN:
     case NODE_EXPR:
+    case NODE_COMPARE:
       return run_expr(node);
 
     case NODE_IF:

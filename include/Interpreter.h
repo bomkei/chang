@@ -13,7 +13,7 @@ public:
   Interpreter();
 
   void expr_obj(ExprKind kind, Object& a, Object& b);
-  bool compare_obj(Object& a, Object& b);
+  bool compare_obj(ExprKind kind, Object& a, Object& b);
 
   Object run_primary(Node* node);
   Object run_expr(Node* node);
