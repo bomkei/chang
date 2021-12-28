@@ -15,8 +15,13 @@ namespace Utils {
   }
 
   inline std::string remove_zero(std::string&& s) {
-    while( !s.empty() && *s.rbegin() == '0' )
+    while( !s.empty() && *s.rbegin() == '0' ) {
+      if( s.length() >= 2 && *(s.rbegin() + 1) == '.' ) {
+        break;
+      }
+      
       s.pop_back();
+    }
     
     return s;
   }

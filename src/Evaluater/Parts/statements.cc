@@ -130,8 +130,7 @@ ObjectType Evaluater::stmt(Node* node) {
 
         if( specified_type.arr_depth ) {
           auto flag = false;
-
-          node->is_make_array = true;
+          auto empty_specified = false;
 
           for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
             if( *it == nullptr ) {
@@ -141,6 +140,11 @@ ObjectType Evaluater::stmt(Node* node) {
             }
             else if( flag ) {
               error(ERR_TYPE, (*it)->token, "cannot specify elements count of array in this depth, due to not specified previous depth.");
+
+              assert((*it)->token->back);
+              assert((*it)->token->back->back);
+              assert((*it)->token->back->back->back);
+
               error(ERR_NOTE, (*it)->token->back->back->back, "due to elements will be empty in this depth, the next count specification is invalid.");
               return { };
             }

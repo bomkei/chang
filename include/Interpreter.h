@@ -12,6 +12,10 @@ class Interpreter {
 public:
   Interpreter();
 
+  Object run_primary(Node* node);
+  Object run_expr(Node* node);
+  Object run_stmt(Node* node);
+
   Object run_node(Node* node);
   Object& run_lvalue(Node* node);
 

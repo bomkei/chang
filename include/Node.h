@@ -28,8 +28,9 @@ enum NodeKind {
   NODE_TYPE,
 
   // call Func
-  //   name = function name
-  //   list = arguments
+  //   name    = function name
+  //   list    = arguments
+  //   objects = sizes of each depth
   NODE_CALLFUNC,
 
   // variable Declaration
