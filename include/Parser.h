@@ -17,6 +17,15 @@ public:
   Node* unary();
   Node* mul();
   Node* add();
+  Node* shift();
+  Node* spaceship();
+  Node* compare();
+  Node* equalty();
+  Node* bit_and();
+  Node* bit_xor();
+  Node* bit_or();
+  Node* log_and();
+  Node* log_or();
   Node* assign();
   Node* expr();
   Node* top();

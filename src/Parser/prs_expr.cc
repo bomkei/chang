@@ -8,61 +8,241 @@
 #include "Global.h"
 
 Node* Parser::mul() {
-  auto node = unary();
+  auto expr = new Node(NODE_EXPR);
 
-  if( token->str == "*" || token->str == "/" ) {
-    auto expr = new Node(NODE_EXPR);
-    expr->expr = node;
-    expr->token = token;
+  expr->token = token;
+  expr->first_expr(unary());
 
-    while( check() ) {
-      ExprKind kind;
+  while( check() ) {
+    ExprKind kind;
 
-      if( consume("*") )
-        kind = EXPR_MUL;
-      else if( consume("/") )
-        kind = EXPR_DIV;
-      else
-        break;
+    if( consume("*") )
+      kind = EXPR_MUL;
+    else if( consume("/") )
+      kind = EXPR_DIV;
+    else
+      break;
 
-      expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, unary() });
-    }
-
-    return expr;
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, unary() });
   }
 
-  return node;
+  return expr;
 }
 
 Node* Parser::add() {
-  auto node = mul();
+  auto expr = new Node(NODE_EXPR);
 
-  if( token->str == "+" || token->str == "-" ) {
-    auto expr = new Node(NODE_EXPR);
-    expr->expr = node;
-    expr->token = token;
+  expr->token = token;
+  expr->first_expr(primary());
 
-    while( check() ) {
-      ExprKind kind;
+  while( check() ) {
+    ExprKind kind;
 
-      if( consume("+") )
-        kind = EXPR_ADD;
-      else if( consume("-") )
-        kind = EXPR_SUB;
-      else
-        break;
-      
-      expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, mul() });
-    }
+    if( consume("+") )
+      kind = EXPR_ADD;
+    else if( consume("-") )
+      kind = EXPR_SUB;
+    else
+      break;
 
-    return expr;
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, primary() });
   }
 
-  return node;
+  return expr;
+}
+
+Node* Parser::shift() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(add());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("<<") )
+      kind = EXPR_LSHIFT;
+    else if( consume("<<") )
+      kind = EXPR_RSHIFT;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, add() });
+  }
+
+  return expr;
+}
+
+Node* Parser::spaceship() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(shift());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("<=>") )
+      kind = EXPR_SPACESHIP;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, shift() });
+  }
+
+  return expr;
+}
+
+Node* Parser::compare() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(spaceship());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("<") )
+      kind = EXPR_RBIGGER;
+    else if( consume(">") )
+      kind = EXPR_LBIGGER;
+    else if( consume("<=") )
+      kind = EXPR_RBIGGER_OR_EQ;
+    else if( consume(">=") )
+      kind = EXPR_LBIGGER_OR_EQ;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, spaceship() });
+  }
+
+  return expr;
+}
+
+Node* Parser::equalty() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(compare());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("==") )
+      kind = EXPR_EQUAL;
+    else if( consume("!=") )
+      kind = EXPR_NOT_EQUAL;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, compare() });
+  }
+
+  return expr;
+}
+
+Node* Parser::bit_and() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(equalty());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("&") )
+      kind = EXPR_BIT_AND;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, equalty() });
+  }
+
+  return expr;
+}
+
+Node* Parser::bit_xor() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(bit_and());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("^") )
+      kind = EXPR_BIT_XOR;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, bit_and() });
+  }
+
+  return expr;
+}
+
+Node* Parser::bit_or() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(bit_xor());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("|") )
+      kind = EXPR_BIT_OR;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, bit_xor() });
+  }
+
+  return expr;
+}
+
+Node* Parser::log_and() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(bit_or());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("&&") )
+      kind = EXPR_AND;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, bit_or() });
+  }
+
+  return expr;
+}
+
+Node* Parser::log_or() {
+  auto expr = new Node(NODE_EXPR);
+
+  expr->token = token;
+  expr->first_expr(log_and());
+
+  while( check() ) {
+    ExprKind kind;
+
+    if( consume("||") )
+      kind = EXPR_OR;
+    else
+      break;
+
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, log_and() });
+  }
+
+  return expr;
 }
 
 Node* Parser::assign() {
-  auto x = add();
+  auto x = log_or();
 
   if( consume("=") ) {
     auto y = new Node(NODE_ASSIGN);
@@ -70,7 +250,7 @@ Node* Parser::assign() {
     y->expr = x;
 
     do {
-      y->list.emplace_back(add());
+      y->list.emplace_back(log_or());
     } while( consume("=") );
 
     x = y;

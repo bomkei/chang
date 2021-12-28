@@ -61,6 +61,7 @@ enum NodeKind {
 };
 
 enum ExprKind {
+  EXPR_FIRST,
   EXPR_ADD,
   EXPR_SUB,
   EXPR_MUL,
@@ -68,8 +69,10 @@ enum ExprKind {
   EXPR_LSHIFT,
   EXPR_RSHIFT,
   EXPR_SPACESHIP,
-  EXPR_BIGGER,
-  EXPR_BIGGER_OR_EQ,
+  EXPR_LBIGGER,
+  EXPR_RBIGGER,
+  EXPR_LBIGGER_OR_EQ,
+  EXPR_RBIGGER_OR_EQ,
   EXPR_EQUAL,
   EXPR_NOT_EQUAL,
   EXPR_BIT_AND,
@@ -132,6 +135,14 @@ struct Node {
   Object const* objptr;
 
   std::size_t scope_depth = 0;
+
+  bool is_single() const {
+    return expr_list.size() == 1;
+  }
+
+  auto& first_expr(Node* node) {
+    return expr_list.emplace_back(ExprPair{ EXPR_FIRST, node->token, node });
+  }
 
   Object& get_var() const {
     return var_scope->objects[var_index];
