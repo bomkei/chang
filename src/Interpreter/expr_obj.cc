@@ -68,12 +68,33 @@ void Interpreter::expr_obj(ExprKind kind, Object& a, Object& b) {
       }
       break;
     }
+  }
+}
 
-    case EXPR_LBIGGER: {
-      switch( kk ) {
-        case OBJ_INT: a.v_bool = 
+bool Interpreter::compare_obj(ExprKind kind, Object& a, Object& b) {
+  switch( a.type.kind ) {
+    case OBJ_INT:
+      switch( kind ) {
+        case EXPR_LBIGGER: return a.v_int > b.v_int;
+        case EXPR_RBIGGER: return a.v_int < b.v_int;
+        case EXPR_LBIGGER_OR_EQ: return a.v_int >= b.v_int;
+        case EXPR_RBIGGER_OR_EQ: return a.v_int <= b.v_int;
+        case EXPR_EQUAL: return a.v_int == b.v_int;
+        case EXPR_NOT_EQUAL: return a.v_int != b.v_int;
       }
       break;
-    }
+      
+    case OBJ_FLOAT:
+      switch( kind ) {
+        case EXPR_LBIGGER: return a.v_float > b.v_float;
+        case EXPR_RBIGGER: return a.v_float < b.v_float;
+        case EXPR_LBIGGER_OR_EQ: return a.v_float >= b.v_float;
+        case EXPR_RBIGGER_OR_EQ: return a.v_float <= b.v_float;
+        case EXPR_EQUAL: return a.v_float == b.v_float;
+        case EXPR_NOT_EQUAL: return a.v_float != b.v_float;
+      }
+      break;
   }
+
+  return false;
 }

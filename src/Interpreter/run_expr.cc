@@ -36,7 +36,27 @@ Object Interpreter::run_expr(Node* node) {
     }
 
     case NODE_COMPARE: {
-      
+      auto obj = run_node(node->expr_list[0].item);
+
+      for( auto it = node->expr_list.begin() + 1; it != node->expr_list.end(); it++ ) {
+        auto&& x = run_node(it->item);
+
+        if( !compare_obj(obj, x) )
+          goto cmp_failure;
+        
+        obj = std::move(x);
+      }
+
+      obj.type = OBJ_BOOL;
+      obj.v_bool = true;
+
+      return obj;
+
+    cmp_failure:
+      obj.type = OBJ_BOOL;
+      obj.v_bool = 0;
+
+      return obj;
     }
   }
 

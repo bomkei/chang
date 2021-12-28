@@ -9,6 +9,11 @@
 ObjectType Evaluater::compare(Node* node) {
   auto& ret = node->objtype;
 
+  if( !ret.equals(OBJ_INT) && !ret.equals(OBJ_FLOAT) ) {
+    error(ERR_TYPE, node->token, "invalid operator");
+    exit(1);
+  }
+
   for( auto it = node->expr_list.begin() + 1; it != node->expr_list.end(); it++ ) {
     if( !ret.equals(evaluate(it->item)) ) {
       error(ERR_TYPE, it->token, "type mismatch");
