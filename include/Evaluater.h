@@ -10,7 +10,10 @@ public:
 
   ObjectType primary(Node* node);
   ObjectType type(Node* node);
+
   ObjectType expr(Node* node);
+  ObjectType compare(Node* node);
+  
   ObjectType stmt(Node* node);
   ObjectType func(Node* node);
 

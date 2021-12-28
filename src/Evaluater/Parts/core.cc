@@ -32,6 +32,9 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_EXPR:
       return expr(node);
 
+    case NODE_COMPARE:
+      return compare(node);
+
     case NODE_IF:
     case NODE_VAR:
     case NODE_RETURN:

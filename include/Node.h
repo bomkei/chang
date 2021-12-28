@@ -7,6 +7,7 @@
 
 enum NodeKind {
   NODE_EXPR,
+  NODE_COMPARE,
   NODE_ASSIGN,
 
   NODE_VALUE,

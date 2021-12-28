@@ -20,7 +20,6 @@ public:
   Node* shift();
   Node* spaceship();
   Node* compare();
-  Node* equalty();
   Node* bit_and();
   Node* bit_xor();
   Node* bit_or();

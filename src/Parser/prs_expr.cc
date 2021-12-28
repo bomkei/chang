@@ -94,7 +94,7 @@ Node* Parser::spaceship() {
 }
 
 Node* Parser::compare() {
-  auto expr = new Node(NODE_EXPR);
+  auto expr = new Node(NODE_COMPARE);
 
   expr->token = token;
   expr->first_expr(spaceship());
@@ -110,6 +110,10 @@ Node* Parser::compare() {
       kind = EXPR_RBIGGER_OR_EQ;
     else if( consume(">=") )
       kind = EXPR_LBIGGER_OR_EQ;
+    else if( consume("==") )
+      kind = EXPR_EQUAL;
+    else if( consume("!=") )
+      kind = EXPR_NOT_EQUAL;
     else
       break;
 
@@ -119,33 +123,11 @@ Node* Parser::compare() {
   return expr->is_single() ? expr->expr_list[0].item : expr;
 }
 
-Node* Parser::equalty() {
-  auto expr = new Node(NODE_EXPR);
-
-  expr->token = token;
-  expr->first_expr(compare());
-
-  while( check() ) {
-    ExprKind kind;
-
-    if( consume("==") )
-      kind = EXPR_EQUAL;
-    else if( consume("!=") )
-      kind = EXPR_NOT_EQUAL;
-    else
-      break;
-
-    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, compare() });
-  }
-
-  return expr->is_single() ? expr->expr_list[0].item : expr;
-}
-
 Node* Parser::bit_and() {
   auto expr = new Node(NODE_EXPR);
 
   expr->token = token;
-  expr->first_expr(equalty());
+  expr->first_expr(compare());
 
   while( check() ) {
     ExprKind kind;
@@ -155,7 +137,7 @@ Node* Parser::bit_and() {
     else
       break;
 
-    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, equalty() });
+    expr->expr_list.emplace_back(Node::ExprPair{ kind, consumed, compare() });
   }
 
   return expr->is_single() ? expr->expr_list[0].item : expr;

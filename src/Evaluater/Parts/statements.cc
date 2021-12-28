@@ -124,13 +124,19 @@ ObjectType Evaluater::stmt(Node* node) {
         auto chk_type = node->expr != nullptr;
         obj.type = specified_type;
 
+        expr_type = evaluate(node->expr);
+
         if( node->expr && !specified_type.equals(expr_type) ) {
+          assert(node->expr->evaluated);
+          assert(node->type->evaluated);
+
           error(ERR_TYPE, node->token, "type mismatch");
           exit(1);
         }
 
         if( specified_type.arr_depth ) {
           auto flag = false;
+          auto warn_printed = false;
           auto empty_specified = false;
 
           node->is_make_array = true;
@@ -140,8 +146,9 @@ ObjectType Evaluater::stmt(Node* node) {
               if( !flag ) {
                 flag = true;
               }
-              else if( !node->expr ) {
-                obj.type.arr_depth = node->type->elemcount_list.end() - it;
+              else if( !node->expr && !warn_printed ) {
+                warn_printed = true;
+                obj.type.arr_depth = node->type->elemcount_list.size() - (node->type->elemcount_list.end() - it);
                 error(ERR_WARN, node->token, "array will be initialized to '%s'", obj.type.to_string().c_str());
               }
             }

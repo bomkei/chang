@@ -34,6 +34,10 @@ Object Interpreter::run_expr(Node* node) {
 
       return obj;
     }
+
+    case NODE_COMPARE: {
+      
+    }
   }
 
   return { };
