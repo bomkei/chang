@@ -30,18 +30,22 @@ ObjectType Evaluater::expr(Node* node) {
     }
 
     case NODE_EXPR: {
-      auto first = evaluate(node->expr_list[0].item);
+      ret = evaluate(node->expr_list[0].item);
 
       if( node->is_single() ) {
-        return first;
+        return ret;
       }
 
       for( auto it = node->expr_list.begin() + 1; it != node->expr_list.end(); it++ ) {
         auto& item = *it;
         auto type = evaluate(item.item);
 
-        if( !type.equals(first) ) {
+        if( !type.equals(ret) ) {
           error(ERR_TYPE, item.token, "type mismatch");
+        }
+
+        if( ret.arr_depth && item.kind != EXPR_ADD ) {
+          error(ERR_OPERATOR, item.token, "invalid operator for array");
         }
 
         switch( type.kind ) {

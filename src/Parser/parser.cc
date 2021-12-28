@@ -68,6 +68,9 @@ Node* Parser::primary() {
           node->list.emplace_back(nullptr);
           break;
         }
+        else if( token->kind == TOK_EOF ) {
+          error(ERR_SYNTAX, node->token, "not closed scope");
+        }
 
         continue;
       }
@@ -280,7 +283,8 @@ Node* Parser::top() {
       auto zero = Global::get_instance()->main_zero = node->expr->list.emplace_back(new Node(NODE_VALUE));
 
       zero->token = node->token;
-      zero->obj.type = OBJ_INT;
+      zero->obj.type = zero->objtype = OBJ_INT;
+      zero->evaluated = true;
     }
 
     return node;
