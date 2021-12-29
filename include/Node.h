@@ -158,6 +158,8 @@ struct Node {
     return -1;
   }
 
+  static std::string to_string(Node* node);
+
   Node(NodeKind kind)
     : kind(kind) {
   }

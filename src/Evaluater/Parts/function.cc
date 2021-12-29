@@ -44,7 +44,7 @@ ObjectType Evaluater::func(Node* node) {
   }
   else if( !func_type.equals(scope_type) ) {
     error(ERR_TYPE, node->expr->token, "type mismatch");
-    error(ERR_NOTE, node->type->token, "specified '%s', but code will return '%s'", func_type.to_string().c_str(), scope_type.to_string().c_str());
+    error(ERR_NOTE, node->type->token, "specified '" + func_type.to_string() + "', but code will return '" + scope_type.to_string() + "'");
   }
 
   in_main = false;

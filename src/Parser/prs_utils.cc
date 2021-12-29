@@ -92,6 +92,10 @@ Node* Parser::expect_type() {
   if( consume("&") ) {
     node->is_reference = true;
   }
+  
+alert;
+  error_node(ERR_SYNTAX, node, "Yeah");
+  exit(1);
 
   return node;
 }

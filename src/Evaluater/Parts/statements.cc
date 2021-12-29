@@ -67,9 +67,48 @@ ObjectType Evaluater::stmt(Node* node) {
       break;
     }
 
+/*
     case NODE_VAR: {
-      var_stmt_list.push_front(node);
+      if( !node->is_allowed_let ) {
+        error(ERR_LOCATION, node->token, "cannot declare variable here");
+        exit(1);
+      }
 
+      auto [scope, index] = find_var(node->name);
+
+      auto cur_scope = *scope_list.begin();
+      auto& obj = cur_scope->objects.emplace_back();
+      
+      if( scope = cur_scope ) {
+        error(ERR_MULTIPLE_DEFINED, node->token, "multiple defined variable name");
+        exit(1);
+      }
+
+      // set info
+      std::tie(obj.name, obj.scope_depth) = std::make_tuple(node->name, cur_scope->scope_depth);
+
+      initialized[&obj] = false;
+      
+      // set pointer
+      node->var_scope = cur_scope;
+      node->var_index = cur_scope->objects.size() - 1;
+
+      if( node->expr ) {
+        auto expr_t = evaluate(node->expr);
+
+        if( node->type ) {
+          auto specified = evaluate(node->type);
+
+          if( !expr_t.equals(specified) ) {
+            
+          }
+        }
+      }
+    }
+
+    */
+
+    case NODE_VAR: {
       if( !node->is_allowed_let ) {
         error(ERR_LOCATION, node->token, "cannot declare variable here");
         exit(1);
@@ -90,6 +129,7 @@ ObjectType Evaluater::stmt(Node* node) {
 
       initialized[&obj] = false;
 
+    // set pointer
       node->var_scope = cur;
       node->var_index = cur->objects.size() - 1;
 
@@ -97,27 +137,20 @@ ObjectType Evaluater::stmt(Node* node) {
       ObjectType expr_type;
 
       if( specified_type.reference || (node->expr && node->expr->kind == NODE_REFERENCE) ) {
-        if( node->expr && !node->expr->evaluated ) {
+        if( !node->expr ) {
+          error(ERR_REFERENCE, node->token, "reference variable declaration is need initializer expression as lvalue");
+          exit(1);
+        }
+        else {
+          if( !is_lvalue(node->expr) ) {
+            error(ERR_VALUE_TYPE, node->expr->token, "initializer expression of reference is must lvalue");
+            exit(1);
+          }
+
           expr_type = evaluate(node->expr);
         }
 
-        if( !node->expr ) {
-          error(ERR_REFERENCE, node->token, "must have intiializer expression due to variable type was specified as reference");
-          exit(1);
-        }
-        else if( !is_lvalue(node->expr) ) {
-          error(ERR_VALUE_TYPE, node->expr->token, "initializer expression of reference is must lvalue");
-          exit(1);
-        }
-        
-        if( ++ref_counter[get_obj_addr(node->expr)] >= 2 ) {
-          error(ERR_REFERENCE, node->token, "cannot make two reference for same object");
-          exit(1);
-        }
-
-        node->get_var().type = specified_type;
-        node->get_var().type.reference = true;
-        node->get_var().address = get_obj_addr(node->expr);
+        (obj.type = specified_type).reference = true;
       }
 
       if( node->type ) {
@@ -149,8 +182,8 @@ ObjectType Evaluater::stmt(Node* node) {
               else if( !node->expr && !warn_printed ) {
                 warn_printed = true;
                 obj.type.arr_depth = node->type->elemcount_list.size() - (node->type->elemcount_list.end() - it);
-                error(ERR_WARN, node->token, "array will be initialized to '%s'", obj.type.to_string().c_str());
-              }
+                error(ERR_WARN, node->token, "array will be initialized to '" + obj.type.to_string() + "'");
+              }4
             }
             else if( flag ) {
               error(ERR_TYPE, (*it)->token, "cannot specify elements count of array in this depth, due to not specified previous depth.");
@@ -174,7 +207,6 @@ ObjectType Evaluater::stmt(Node* node) {
               check_array(node->type->elemcount_list.begin(), node->objects.begin(), specified_type.arr_depth, node->expr);
             }
 
-            var_stmt_list.pop_front();
             initialized[&obj] = true;
             break;
           }
@@ -189,7 +221,6 @@ ObjectType Evaluater::stmt(Node* node) {
       }
 
       initialized[&obj] = true;
-      var_stmt_list.pop_front();
       break;
     }
 

@@ -46,7 +46,5 @@ private:
   bool in_main = false;
   std::size_t scope_depth = 0;
   std::list<Node*> scope_list;
-  std::list<Node*> var_stmt_list;
-  std::map<Object*, int> ref_counter;
   std::map<Object*, bool> initialized;
 };

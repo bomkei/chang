@@ -33,7 +33,7 @@ ObjectType Evaluater::primary(Node* node) {
         break;
       }
 
-      error(ERR_UNDEFINED, node->token, "undefined variable name '%s'", Utils::str(node->name));
+      error(ERR_UNDEFINED, node->token, "undefined variable name '" + Utils::str(node->name) + "'");
       exit(1);
     }
 

@@ -31,12 +31,21 @@ bool Evaluater::is_lvalue(Node* node) {
 
 Object* Evaluater::get_obj_addr(Node* node) {
   assert(node != nullptr);
-  assert(is_lvalue(node));
   assert(node->evaluated);
   
   switch( node->kind ) {
     case NODE_VARIABLE: {
+      alert;
       return &node->get_var();
+    }
+
+    case NODE_INDEX_REF: {
+      if( is_lvalue(node->lhs) ) {
+        error(ERR_VALUE_TYPE, node->lhs->token, "expression is must lvalue");
+        exit(1);
+      }
+
+      return 
     }
 
     case NODE_REFERENCE: {

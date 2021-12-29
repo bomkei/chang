@@ -27,4 +27,7 @@ enum ErrorKind {
 };
 
 void errortext(char const* fmt, ...);
-void error(ErrorKind kind, Token* token, char const* fmt, ...);
+
+void error(ErrorKind kind, Token* token, std::string const& msg);
+void error_node(ErrorKind kind, Node* node, std::string const& msg);
+
