@@ -8,8 +8,15 @@
 
 Object Interpreter::run_primary(Node* node) {
   switch( node->kind ) {
-    case NODE_VALUE:
+    case NODE_VALUE: {
+      return node->obj;
+    }
+
     case NODE_REFERENCE: {
+      auto&& x = run_lvalue(node->expr);
+      
+      node->obj.address = &x;
+
       return node->obj;
     }
 

@@ -59,13 +59,16 @@ ObjectType Evaluater::primary(Node* node) {
       }
 
       ret = evaluate(node->expr);
+
+      if( ret.reference ) {
+        error(ERR_TYPE, node->token, "cannot nest reference");
+        exit(1);
+      }
+
       ret.reference = true;
 
-      // node->expr == NODE_VARIABLE
-      
       node->scope_depth = node->expr->scope_depth;
       node->obj.type = ret;
-      node->obj.address = node->objptr = get_obj_addr(node->expr);
 
       break;
     }

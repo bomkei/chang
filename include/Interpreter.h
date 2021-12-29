@@ -15,6 +15,8 @@ public:
   void expr_obj(ExprKind kind, Object& a, Object& b);
   bool compare_obj(ExprKind kind, Object& a, Object& b);
 
+  Object& obj_index(Object& obj, long index, Token* token);
+
   Object run_primary(Node* node);
   Object run_expr(Node* node);
   Object run_stmt(Node* node);

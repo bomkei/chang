@@ -57,7 +57,6 @@ bool Object::equals(Object const& obj) const {
 
 std::string Object::to_string() const {
   if( type.reference ) {
-    alert;
     return address->to_string();
   }
 

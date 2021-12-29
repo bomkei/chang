@@ -35,7 +35,8 @@ bool Evaluater::is_lvalue(Node* node) {
 
     case NODE_REFERENCE:
       if( is_lvalue(node->expr) ) {
-        
+        node->scope_depth = node->expr->scope_depth;
+        return true;
       }
 
       break;

@@ -17,6 +17,7 @@ enum NodeKind {
   NODE_INDEX_REF,
 
   NODE_REFERENCE,
+  NODE_DEREFERENCE,
   NODE_MEMBER_ACCESS,
 
   // argument

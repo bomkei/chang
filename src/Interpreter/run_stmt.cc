@@ -26,23 +26,13 @@ Object Interpreter::run_stmt(Node* node) {
     case NODE_VAR: {
       var_stmt_list.push_front(node);
 
-      if( node->is_make_array ) {
-        auto ec_it = node->objects.begin();
+      auto& obj = node->get_var();
 
-        for( auto&& ec : node->type->elemcount_list ) {
-          if( ec != nullptr ) {
-            *ec_it++ = run_node(ec);
-          }
-        }
-      }
-
-      if( !node->expr ) {
-        if( node->is_make_array ) {
-          node->get_var() = construct_array(node->type->objtype.kind, node->objects.rend(), node->objects.rbegin());
-        }
+      if( node->expr ) {
+        obj = run_node(node->expr);
       }
       else {
-        node->get_var() = run_node(node->expr);
+        obj.type = node->type->objtype;
       }
 
       var_stmt_list.pop_front();

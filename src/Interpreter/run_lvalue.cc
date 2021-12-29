@@ -13,12 +13,27 @@ Object& Interpreter::run_lvalue(Node* node) {
 
   switch( node->kind ) {
     case NODE_VARIABLE: {
-      return node->get_var();
+      auto& obj = node->get_var();
+
+      if( obj.type.reference ) {
+        return *obj.address;
+      }
+
+      return obj;
+    }
+
+    case NODE_INDEX_REF: {
+      auto&& arr = run_node(node->lhs);
+      return obj_index(arr, run_node(node->rhs).v_int, node->token);
+    }
+
+    case NODE_REFERENCE: {
+      return *(node->obj.address);
     }
   }
 
   error(ERR_TYPE, node->token,
-    "omg this is not a lvalue, but why you can see this error?"
+    "omg this is not a lvalue, but why can you see this error? "
     PLEASE_REPORT "9oGb83NNmwx");
   exit(1);
 }

@@ -104,9 +104,15 @@ ObjectType Evaluater::stmt(Node* node) {
         }
 
         obj.type = expr_t;
+        node->is_reference = expr_t.reference;
       }
       else {
         obj.type = evaluate(node->type);
+
+        if( obj.type.reference ) {
+          error(ERR_VALUE_TYPE, node->token, "expected initializer expression");
+          exit(1);
+        }
       }
 
       initialized[&obj] = true;
