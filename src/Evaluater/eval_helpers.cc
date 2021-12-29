@@ -67,30 +67,15 @@ std::vector<ObjectType> Evaluater::eval_func_args(Node* func) {
   return ret;
 }
 
-std::vector<Node*> Evaluater::find_func(std::string_view const& name, std::vector<ObjectType> const& arg_types) {
-  std::vector<Node*> ret;
-
+Node* Evaluater::find_func(std::string_view const& name) {
   for( auto it = scope_list.begin(); it != scope_list.end(); it++ ) {
     for( auto&& i : (*it)->list ) {
       if( i && i->kind == NODE_FUNCTION && i->name == name ) {
-        auto args = eval_func_args(i);
-
-        if( args.size() != arg_types.size() ) {
-          continue;
-        }
-        else {
-          for( std::size_t i = 0; i < args.size(); i++ ) {
-            if( !args[i].equals(arg_types[i]) ) {
-              goto cnt_label;
-            }
-          }
-        }
-
-        ret.emplace_back(i);
-      cnt_label:;
+        return i;
       }
     }
   }
 
-  return ret;
+  return nullptr;
 }
+

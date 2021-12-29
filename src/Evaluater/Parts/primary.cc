@@ -106,14 +106,15 @@ ObjectType Evaluater::primary(Node* node) {
 
       std::size_t argc;
       bool arg_free;
-      std::vector<ObjectType> args;
-      std::vector<Node*> find_userdef;
-      Node* fn;
+      std::vector<ObjectType> call_args;
+      std::vector<ObjectType> func_args;
+      Node* find;
 
       for( auto&& i : node->list ) {
-        args.emplace_back(evaluate(i));
+        call_args.emplace_back(evaluate(i));
       }
 
+      // find builtin
       for( auto&& i : builtin ) {
         if( i.name == node->name ) {
           argc = i.arg_types.size();
@@ -124,43 +125,31 @@ ObjectType Evaluater::primary(Node* node) {
         }
       }
 
-      find_userdef = find_func(node->name, args);
+      find = find_func(node->name);
 
-      // todo: check finely
-      // todo: add find_func_same_name()
-
-      if( find_userdef.empty() ) {
-        error(ERR_UNDEFINED, node->token, "undefined function");
-
-        for( auto&& scope : scope_list ) {
-          for( auto&& i : scope->list ) {
-            if( i && i->kind == NODE_FUNCTION && i->name == node->name )
-              find_userdef.emplace_back(i);
-          }
-        }
-
-        if( !find_userdef.empty() ) {
-          error(ERR_NOTE, node->token, "but found some function with same name, maybe did you tried call with wrong arguments?");
-
-          for( auto&& i : find_userdef ) {
-            error(ERR_NOTE, i->token, "got this");
-          }
-        }
-
+      if( !find ) {
+        error(ERR_UNDEFINED, node->token, "undefined function name");
         exit(1);
       }
-      else if( find_userdef.size() > 1 ) {
-        error(ERR_CANDIDATES, node->token, "found many candidates with this name");
 
-        for( auto&& i : find_userdef ) {
-          error(ERR_NOTE, i->token, "got this");
+      func_args = eval_func_args(find);
+
+      if( call_args.size() != func_args.size() ) {
+        error(ERR_ARGUMENT, node->token, "no match arguments count");
+      }
+      else {
+        for( std::size_t i = 0; i < call_args.size(); i++ ) {
+          auto const& c = call_args[i];
+          auto const& f = func_args[i];
+
+          if( !c.equals(f) ) {
+            error(ERR_TYPE, node->list[i]->token, "expected '" + f.to_string() + "', but found '" + c.to_string() + "'");
+          }
         }
       }
-
-      fn = find_userdef[0];
-
-      ret = evaluate(fn->expr);
-      node->func = fn;
+      
+      ret = evaluate(find->expr);
+      node->func = find;
       break;
 
     check_process:;

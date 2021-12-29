@@ -41,7 +41,7 @@ private:
   std::pair<Node*, std::size_t> find_var(std::string_view const& name);
   
   std::vector<ObjectType> eval_func_args(Node* func);
-  std::vector<Node*> find_func(std::string_view const& name, std::vector<ObjectType> const& arg_types);
+  Node* find_func(std::string_view const& name);
 
   bool in_main = false;
   std::size_t scope_depth = 0;
