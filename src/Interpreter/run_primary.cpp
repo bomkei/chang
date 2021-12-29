@@ -3,6 +3,7 @@
 #include "Token.h"
 #include "Object.h"
 #include "Node.h"
+#include "Utils.h"
 #include "BuiltinFunc.h"
 #include "Interpreter.h"
 
@@ -12,26 +13,42 @@ Object Interpreter::run_primary(Node* node) {
       return node->obj;
     }
 
+    case NODE_VARIABLE: {
+      alert;
+      auto& x = run_lvalue(node);
+
+      alert;
+      return x;
+    }
+
     case NODE_REFERENCE: {
       auto&& x = run_lvalue(node->expr);
       
       node->obj.address = &x;
 
+      debug(
+        alert;
+        printval(p,node->obj.address);
+      )
+
       return node->obj;
     }
 
-    case NODE_VARIABLE:
-      return run_lvalue(node);
+    case NODE_DEREFERENCE: {
+      alert;
+      auto&& x = run_lvalue(node->expr);
+
+      assert(x.address);
+
+
+      return *x.address;
+    }
 
     case NODE_INDEX_REF: {
       auto obj = run_node(node->lhs);
       auto index = run_node(node->rhs).v_int;
 
-      if( index < 0 || index >= obj.list.size() ) {
-        error(ERR_OUT_OF_RANGE, node->token, "subscript out of range");
-      }
-
-      return obj.list[index];
+      return obj_index(obj, index, node->token);
     }
 
     case NODE_CALLFUNC: {

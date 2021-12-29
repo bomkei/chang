@@ -7,21 +7,6 @@
 #include "Parser.h"
 #include "Global.h"
 
-Parser::Parser(Token* token)
-  : token(token), consumed(nullptr) {
-
-}
-
-Node* Parser::parse() {
-  auto node = new Node(NODE_SCOPE);
-
-  while( check() ) {
-    node->list.emplace_back(top());
-  }
-
-  return node;
-}
-
 Node* Parser::primary() {
   if( consume("(") ) {
     auto e = expr();
@@ -231,60 +216,14 @@ Node* Parser::unary() {
     return x;
   }
 
-  return member();
-}
+  if( consume("*") ) {
+    auto x = new Node(NODE_DEREFERENCE);
 
-Node* Parser::top() {
-  if( consume("fn") ) {
-    auto node = new Node(NODE_FUNCTION);
-    node->token = consumed;
+    x->token = consumed;
+    x->expr = member();
 
-    expect_ident();
-    node->name = token->str;
-
-    auto is_main = node->name == "main";
-
-    if( is_main ) {
-      Global::get_instance()->entry_point = node;
-
-      node->type = new Node(NODE_TYPE);
-      node->type->name = "int";
-      node->type->token = node->token;
-    }
-
-    next();
-    expect("(");
-
-    if( !consume(")") ) {
-      do {
-        node->list.emplace_back(expect_argument());
-      } while( consume(",") );
-      expect(")");
-    }
-
-    if( consume("->") ) {
-      if( is_main ) {
-        error(ERR_UNEXPECTED, consumed, "cannot specify return type of 'main' function, already specified as int implicity.");
-        exit(1);
-      }
-
-      node->type = expect_type();
-    }
-
-    expect("{", false);
-    node->expr = expr();
-
-    if( is_main ) {
-      auto zero = Global::get_instance()->main_zero = node->expr->list.emplace_back(new Node(NODE_VALUE));
-
-      zero->token = node->token;
-      zero->obj.type = zero->objtype = OBJ_INT;
-      zero->evaluated = true;
-    }
-
-    return node;
+    return x;
   }
 
-  error(ERR_PARSE, token, "expected function declare");
-  exit(1);
+  return member();
 }

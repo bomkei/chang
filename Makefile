@@ -1,5 +1,7 @@
 TARGET		= chang
 
+SUFFIX		= cpp
+
 BUILD			= build
 INCLUDES	= include
 SOURCES		= src
@@ -24,17 +26,17 @@ ifeq ($(OS),Windows_NT)
 
 else
 
-%.o: %.cc
+%.o: %.$(SUFFIX)
 	@echo $(notdir $<)
 	@clang++ -MP -MMD -MF $*.d $(CXXFLAGS) -c -o $@ $<
 
 ifneq ($(notdir $(CURDIR)), $(BUILD))
 
 SRCDIRS		= $(SOURCES) $(foreach dir,$(SUBDIRS),$(SOURCES)/$(dir))
-CXXFILES	= $(foreach dir,$(SRCDIRS),$(notdir $(wildcard $(dir)/*.cc)))
+CXXFILES	= $(foreach dir,$(SRCDIRS),$(notdir $(wildcard $(dir)/*.$(SUFFIX))))
 
 export VPATH		= $(CURDIR)/$(SOURCES) $(foreach dir,$(SUBDIRS),$(CURDIR)/$(SOURCES)/$(dir))
-export OFILES		= $(CXXFILES:.cc=.o)
+export OFILES		= $(CXXFILES:.$(SUFFIX)=.o)
 export OUTPUT		= $(CURDIR)/$(TARGET)
 export INCLUDE	= $(foreach dir,$(INCLUDES),-I $(CURDIR)/$(dir))
 

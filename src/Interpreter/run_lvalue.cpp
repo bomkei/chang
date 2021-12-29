@@ -16,7 +16,12 @@ Object& Interpreter::run_lvalue(Node* node) {
       auto& obj = node->get_var();
 
       if( obj.type.reference ) {
-        return *obj.address;
+        alert;
+
+        auto& x = *obj.address;
+
+        alert;
+        return x;
       }
 
       return obj;
@@ -24,16 +29,26 @@ Object& Interpreter::run_lvalue(Node* node) {
 
     case NODE_INDEX_REF: {
       auto&& arr = run_node(node->lhs);
-      return obj_index(arr, run_node(node->rhs).v_int, node->token);
+
+      alert;
+
+      auto& x = obj_index(arr, run_node(node->rhs).v_int, node->token);
+
+      alert;
+
+      return x;
     }
 
     case NODE_REFERENCE: {
+      alert;
       return *(node->obj.address);
     }
   }
 
+  alert;
+
   error(ERR_TYPE, node->token,
-    "omg this is not a lvalue, but why can you see this error? "
+    "omg this is not a lvalue, but why this error have been occur?? "
     PLEASE_REPORT "9oGb83NNmwx");
   exit(1);
 }

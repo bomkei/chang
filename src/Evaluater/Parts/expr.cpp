@@ -75,6 +75,7 @@ ObjectType Evaluater::expr(Node* node) {
       }
 
       ret = evaluate(node->expr);
+      ret.reference = false;
 
       for( auto&& i : node->list ) {
         if( i != *node->list.rbegin() && !is_lvalue(i) ) {

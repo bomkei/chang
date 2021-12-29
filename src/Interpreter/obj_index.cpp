@@ -9,8 +9,11 @@
 
 Object& Interpreter::obj_index(Object& obj, long index, Token* token) {
   if( index < 0 || index >= obj.list.size() ) {
+    alert;
     error(ERR_OUT_OF_RANGE, token, "index out of range");
+    exit(1);
   }
 
+  alert;
   return obj.list[index];
 }

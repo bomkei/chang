@@ -25,8 +25,8 @@ bool Evaluater::is_lvalue(Node* node) {
       return true;
 
     case NODE_INDEX_REF: {
-      if( is_lvalue(node->expr) ) {
-        node->scope_depth = node->expr->scope_depth;
+      if( is_lvalue(node->lhs) ) {
+        node->scope_depth = node->lhs->scope_depth;
         return true;
       }
 

@@ -21,6 +21,7 @@ ObjectType Evaluater::evaluate(Node* node) {
     case NODE_VARIABLE:
     case NODE_INDEX_REF:
     case NODE_REFERENCE:
+    case NODE_DEREFERENCE:
     case NODE_CALLFUNC:
     case NODE_ARGUMENT:
       return primary(node);

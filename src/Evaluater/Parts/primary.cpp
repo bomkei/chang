@@ -72,6 +72,18 @@ ObjectType Evaluater::primary(Node* node) {
 
       break;
     }
+
+    case NODE_DEREFERENCE: {
+      ret = evaluate(node->expr);
+
+      if( !ret.reference ) {
+        error(ERR_TYPE, node->token, "cannot dereference not reference variable");
+        exit(1);
+      }
+
+      ret.reference = false;
+      break;
+    }
     
     case NODE_ARRAY: {
       if( node->is_allowed_empty_array ) {
