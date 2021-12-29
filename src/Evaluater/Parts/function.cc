@@ -8,6 +8,12 @@
 
 ObjectType Evaluater::func(Node* node) {
   auto& ret = node->objtype;
+  auto find = find_func(node->name);
+
+  if( find != node ) {
+    error(ERR_MULTIPLE_DEFINED, node->token, "multiple defined function name");
+    error(ERR_NOTE, find->token, "defined here");
+  }
 
   in_main = node->name == "main";
 
