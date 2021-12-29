@@ -27,7 +27,7 @@ bool Parser::consume(char const* str) {
 
 void Parser::expect(char const* str, bool step) {
   if( step ? !consume(str) : token->str != str ) {
-    error(ERR_EXPECTED, token, "expected '%s'", str);
+    error(ERR_EXPECTED, token, Utils::String::link("expected '", str, "'"));
     exit(1);
   }
 }

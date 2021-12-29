@@ -22,68 +22,26 @@ bool Evaluater::is_lvalue(Node* node) {
 
   switch( node->kind ) {
     case NODE_VARIABLE:
-    case NODE_REFERENCE:
       return true;
+
+    case NODE_INDEX_REF: {
+      if( is_lvalue(node->expr) ) {
+        node->scope_depth = node->expr->scope_depth;
+        return true;
+      }
+
+      break;
+    }
+
+    case NODE_REFERENCE:
+      if( is_lvalue(node->expr) ) {
+        
+      }
+
+      break;
   }
 
   return false;
-}
-
-Object* Evaluater::get_obj_addr(Node* node) {
-  assert(node != nullptr);
-  assert(node->evaluated);
-  
-  switch( node->kind ) {
-    case NODE_VARIABLE: {
-      alert;
-      return &node->get_var();
-    }
-
-    case NODE_INDEX_REF: {
-      if( is_lvalue(node->lhs) ) {
-        error(ERR_VALUE_TYPE, node->lhs->token, "expression is must lvalue");
-        exit(1);
-      }
-
-      return 
-    }
-
-    case NODE_REFERENCE: {
-      return get_obj_addr(node->expr);
-    }
-  }
-
-  error(ERR_VALUE_TYPE, node->token, "please report to developer.(code=0x4gbs8j2k)");
-  exit(1);
-}
-
-void Evaluater::check_array(std::vector<Node*>::const_iterator ec_list_it, std::vector<Object>::const_iterator ec_obj_list_it, std::size_t depth, Node* arr) {
-  auto arr_type = evaluate(arr);
-  arr->objptr = &*ec_obj_list_it;
-
-  if( *ec_list_it != nullptr ) {
-    if( arr->kind != NODE_ARRAY ) {
-      error(ERR_TYPE, arr->token, "expected empty array");
-      return;
-    }
-    else if( !arr->list.empty() ) {
-      error(ERR_TYPE, arr->token, "array must be empty");
-      return;
-    }
-
-    arr->objtype.arr_depth = depth;
-    return;
-  }
-
-  if( arr_type.arr_depth != depth ) {
-    error(ERR_TYPE, arr->token, "type mismatch");
-  }
-
-  if( depth >= 2 && arr->kind == NODE_ARRAY ) {
-    for( auto&& i : arr->list ) {
-      check_array(ec_list_it + 1, ec_obj_list_it + 1, depth - 1, i);
-    }
-  }
 }
 
 std::pair<Node*, std::size_t> Evaluater::find_var(std::string_view const& name) {

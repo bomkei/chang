@@ -1,6 +1,7 @@
 #pragma once
 
-struct Token;
+#include <string>
+#include "typefwd.h"
 
 enum ErrorKind {
   ERR_LEX,

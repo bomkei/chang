@@ -2,6 +2,7 @@
 
 #include <codecvt>
 #include <cstring>
+#include <sstream>
 #include <locale>
 #include <string>
 #include <vector>
@@ -75,6 +76,19 @@ namespace Utils {
 
     static std::u16string to_utf16(char const* str) {
       return conv.from_bytes(str);
+    }
+
+    template <class T, class... Args>
+    static std::string link(T&& a, Args&& ... args) {
+      std::stringstream ss;
+
+      ss << a;
+
+      if constexpr( sizeof...(args) >= 1 ) {
+        ss << link(args...);
+      }
+
+      return ss.str();
     }
   };
 }

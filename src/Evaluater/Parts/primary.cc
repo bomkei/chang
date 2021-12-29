@@ -41,7 +41,7 @@ ObjectType Evaluater::primary(Node* node) {
       ret = evaluate(node->lhs);
 
       if( ret.arr_depth == 0 ) {
-        error(ERR_TYPE, node->token, "left side is must array type");
+        error(ERR_TYPE, node->token, "left side is must array");
       }
 
       if( !evaluate(node->rhs).equals(OBJ_INT) ) {

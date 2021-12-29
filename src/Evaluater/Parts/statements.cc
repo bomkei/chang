@@ -67,47 +67,6 @@ ObjectType Evaluater::stmt(Node* node) {
       break;
     }
 
-/*
-    case NODE_VAR: {
-      if( !node->is_allowed_let ) {
-        error(ERR_LOCATION, node->token, "cannot declare variable here");
-        exit(1);
-      }
-
-      auto [scope, index] = find_var(node->name);
-
-      auto cur_scope = *scope_list.begin();
-      auto& obj = cur_scope->objects.emplace_back();
-      
-      if( scope = cur_scope ) {
-        error(ERR_MULTIPLE_DEFINED, node->token, "multiple defined variable name");
-        exit(1);
-      }
-
-      // set info
-      std::tie(obj.name, obj.scope_depth) = std::make_tuple(node->name, cur_scope->scope_depth);
-
-      initialized[&obj] = false;
-      
-      // set pointer
-      node->var_scope = cur_scope;
-      node->var_index = cur_scope->objects.size() - 1;
-
-      if( node->expr ) {
-        auto expr_t = evaluate(node->expr);
-
-        if( node->type ) {
-          auto specified = evaluate(node->type);
-
-          if( !expr_t.equals(specified) ) {
-            
-          }
-        }
-      }
-    }
-
-    */
-
     case NODE_VAR: {
       if( !node->is_allowed_let ) {
         error(ERR_LOCATION, node->token, "cannot declare variable here");
@@ -129,95 +88,25 @@ ObjectType Evaluater::stmt(Node* node) {
 
       initialized[&obj] = false;
 
-    // set pointer
+      // set pointer
       node->var_scope = cur;
       node->var_index = cur->objects.size() - 1;
 
-      auto specified_type = evaluate(node->type);
-      ObjectType expr_type;
+      auto expr_t = evaluate(node->expr);
 
-      if( specified_type.reference || (node->expr && node->expr->kind == NODE_REFERENCE) ) {
-        if( !node->expr ) {
-          error(ERR_REFERENCE, node->token, "reference variable declaration is need initializer expression as lvalue");
-          exit(1);
-        }
-        else {
-          if( !is_lvalue(node->expr) ) {
-            error(ERR_VALUE_TYPE, node->expr->token, "initializer expression of reference is must lvalue");
-            exit(1);
-          }
+      if( node->expr ) {
+        if( node->type ) {
+          auto specify = evaluate(node->type);
 
-          expr_type = evaluate(node->expr);
-        }
-
-        (obj.type = specified_type).reference = true;
-      }
-
-      if( node->type ) {
-        auto chk_type = node->expr != nullptr;
-        obj.type = specified_type;
-
-        expr_type = evaluate(node->expr);
-
-        if( node->expr && !specified_type.equals(expr_type) ) {
-          assert(node->expr->evaluated);
-          assert(node->type->evaluated);
-
-          error(ERR_TYPE, node->token, "type mismatch");
-          exit(1);
-        }
-
-        if( specified_type.arr_depth ) {
-          auto flag = false;
-          auto warn_printed = false;
-          auto empty_specified = false;
-
-          node->is_make_array = true;
-
-          for( auto it = node->type->elemcount_list.begin(); it != node->type->elemcount_list.end(); it++ ) {
-            if( *it == nullptr ) {
-              if( !flag ) {
-                flag = true;
-              }
-              else if( !node->expr && !warn_printed ) {
-                warn_printed = true;
-                obj.type.arr_depth = node->type->elemcount_list.size() - (node->type->elemcount_list.end() - it);
-                error(ERR_WARN, node->token, "array will be initialized to '" + obj.type.to_string() + "'");
-              }4
-            }
-            else if( flag ) {
-              error(ERR_TYPE, (*it)->token, "cannot specify elements count of array in this depth, due to not specified previous depth.");
-
-              assert((*it)->token);
-              assert((*it)->token->back);
-              assert((*it)->token->back->back);
-              assert((*it)->token->back->back->back);
-
-              error(ERR_NOTE, (*it)->token->back->back->back, "due to elements will be empty in this depth, the next count specification is invalid.");
-              return { };
-            }
-
-            node->objects.emplace_back();
-          }
-
-          if( node->type->elemcount_list[0] ) {
-            if( node->expr ) {
-              node->expr->is_allowed_empty_array = true;
-              (node->expr->objtype = specified_type).arr_depth = 1;
-              check_array(node->type->elemcount_list.begin(), node->objects.begin(), specified_type.arr_depth, node->expr);
-            }
-
-            initialized[&obj] = true;
-            break;
+          if( !specify.equals(expr_t) ) {
+            error(ERR_TYPE, node->type->token, "expected '" + expr_t.to_string() + "'");
           }
         }
 
-        if( chk_type && !evaluate(node->expr).equals(specified_type) ) {
-          error(ERR_TYPE, node->token, "type mismatch");
-        }
+        obj.type = expr_t;
       }
       else {
-        obj.type = evaluate(node->expr);
+        obj.type = evaluate(node->type);
       }
 
       initialized[&obj] = true;
