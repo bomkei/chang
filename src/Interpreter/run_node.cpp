@@ -37,5 +37,7 @@ Object Interpreter::run_node(Node* node) {
       break;
   }
 
+  warn_not_handle(node->kind);
+
   return { };
 }

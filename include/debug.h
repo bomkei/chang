@@ -10,6 +10,7 @@
   #include <cstdio>
 
   #define alert fprintf(stderr,"\t#alert at %s:%d\n",__FILE__,__LINE__)
+  #define warn_not_handle(kind)  alert;fprintf(stderr,"\tmay be not handled: " #kind " = %d\n",kind)
   #define debug(...) __VA_ARGS__
   #define printval(fmtch,expr)  fprintf(stderr,#expr " = %" #fmtch "\n",expr)
   #define dbgprint(...) fprintf(stderr,__VA_ARGS__)
