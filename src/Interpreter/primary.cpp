@@ -14,11 +14,7 @@ Object Interpreter::run_primary(Node* node) {
     }
 
     case NODE_VARIABLE: {
-      alert;
-      auto& x = run_lvalue(node);
-
-      alert;
-      return x;
+      return run_lvalue(node);
     }
 
     case NODE_REFERENCE: {
@@ -26,20 +22,11 @@ Object Interpreter::run_primary(Node* node) {
       
       node->obj.address = &x;
 
-      debug(
-        alert;
-        printval(p,node->obj.address);
-      )
-
       return node->obj;
     }
 
     case NODE_DEREFERENCE: {
-      alert;
       auto&& x = run_lvalue(node->expr);
-
-      assert(x.address);
-
 
       return *x.address;
     }
@@ -64,6 +51,7 @@ Object Interpreter::run_primary(Node* node) {
       }
 
       const auto argc = node->func->list.size();
+      
       for( std::size_t i = 0; i < argc; i++ ) {
         save.emplace_back(node->func->expr->objects[i]);
         node->func->expr->objects[i] = args[i];

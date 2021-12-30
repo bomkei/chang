@@ -13,7 +13,7 @@ Object::Object(Object&& obj)
 }
 
 Object& Object::operator = (Object&& obj) {
-  type = std::move(obj.type);
+  type = obj.type;
   name = obj.name;
   scope_depth = obj.scope_depth;
   v_int = obj.v_int;

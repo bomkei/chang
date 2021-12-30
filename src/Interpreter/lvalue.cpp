@@ -15,6 +15,7 @@ Object& Interpreter::run_lvalue(Node* node) {
     case NODE_VARIABLE: {
       auto& obj = node->get_var();
 
+/*
       if( obj.type.reference ) {
         alert;
 
@@ -23,6 +24,7 @@ Object& Interpreter::run_lvalue(Node* node) {
         alert;
         return x;
       }
+      */
 
       return obj;
     }
