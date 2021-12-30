@@ -99,12 +99,18 @@ def change_ext(file, ext):
 def compile_wrap(file):
   builder.compile(file)
 
+def clean():
+  os.system(f"rm -drf {builder.objdir}")
+  os.system(f"rm -drf {builder.output}")
+
 builder = Builder()
 argv = sys.argv
 
-if "clean" in argv:
-  os.system(f"rm -drf {builder.objdir}")
-  exit(1)
+if "clean" in argv or "re" in argv:
+  clean()
+  
+  if "clean" in argv:
+    exit(1)
 
 builder.run("-j" in argv)
 
