@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
@@ -33,10 +34,14 @@ class Builder:
 
     self.get_sources()
 
-    for i in self.src_files:
-      if self.compile(i) != 0:
-        os.system(f"rm {self.objdir}/*.cpp")
-        return 1
+    if with_multi_thread:
+      with ThreadPoolExecutor() as exe:
+        exe.map(compile_wrap, self.src_files)
+    else:
+      for i in self.src_files:
+        if self.compile(i) != 0:
+          os.system(f"rm {self.objdir}/*.cpp")
+          return 1
   
     if self.updated or not os.path.exists(self.output):
       print("linking...")
@@ -77,7 +82,8 @@ class Builder:
 
   def check_build(self, file):
     ft = os.path.getmtime(self.actual_src_file_cache[file[file.find("/")+1:]])
-    obj = os.path.getmtime(change_ext(file, "o"))
+    obj_path = change_ext(file, "o")
+    obj = os.path.getmtime(obj_path) if os.path.exists(obj_path) else 0
 
     if not os.path.exists(change_ext(file, "o")) or ft > obj:
       return True
@@ -99,7 +105,15 @@ class Builder:
 def change_ext(file, ext):
   return file[:file.rfind(".")] + "." + ext
 
-builder = Builder()
+def compile_wrap(file):
+  builder.compile(file)
 
-builder.run(False)
+builder = Builder()
+argv = sys.argv
+
+if "clean" in argv:
+  os.system(f"rm -drf {builder.objdir}")
+  exit(1)
+
+builder.run("-j" in argv)
 
