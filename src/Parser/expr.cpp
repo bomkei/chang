@@ -227,15 +227,7 @@ Node* Parser::assign() {
   auto x = log_or();
 
   if( consume("=") ) {
-    auto y = new Node(NODE_ASSIGN);
-
-    y->expr = x;
-
-    do {
-      y->list.emplace_back(log_or());
-    } while( consume("=") );
-
-    x = y;
+    return new Node(NODE_ASSIGN, x, assign(), consumed);
   }
 
   return x;

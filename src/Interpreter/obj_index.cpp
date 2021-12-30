@@ -14,6 +14,5 @@ Object& Interpreter::obj_index(Object& obj, long index, Token* token) {
     exit(1);
   }
 
-  alert;
   return obj.list[index];
 }

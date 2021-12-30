@@ -40,6 +40,9 @@ bool Evaluater::is_lvalue(Node* node) {
       }
 
       break;
+    
+    case NODE_DEREFERENCE:
+      return is_lvalue(node->expr);
   }
 
   return false;

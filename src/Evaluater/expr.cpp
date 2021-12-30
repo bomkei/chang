@@ -70,21 +70,20 @@ ObjectType Evaluater::expr(Node* node) {
 
   switch( node->kind ) {
     case NODE_ASSIGN: {
-      if( !is_lvalue(node->expr) ) {
-        error(ERR_VALUE_TYPE, node->expr->token, "expression is must lvalue");
+      if( !is_lvalue(node->lhs) ) {
+        error(ERR_VALUE_TYPE, node->token, "left side expression is must lvalue");
       }
 
-      ret = evaluate(node->expr);
-      ret.reference = false;
+      ret = evaluate(node->lhs);
 
-      for( auto&& i : node->list ) {
-        if( i != *node->list.rbegin() && !is_lvalue(i) ) {
-          error(ERR_VALUE_TYPE, i->token, "expression is must lvalue");
-        }
-        
-        if( !ret.equals(evaluate(i)) ) {
-          error(ERR_TYPE, i->token, "type mismatch");
-        }
+      if( ret.reference ) {
+        error(ERR_TYPE, node->token, "cannot assignment to reference object");
+        error(ERR_NOTE, node->token, "but you can assignment to dereferenced object");
+        exit(1);
+      }
+
+      if( !ret.equals(evaluate(node->rhs)) ) {
+        error(ERR_TYPE, node->token, "type mismatch");
       }
 
       break;

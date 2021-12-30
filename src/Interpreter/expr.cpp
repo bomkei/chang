@@ -9,11 +9,7 @@
 Object Interpreter::run_expr(Node* node) {
   switch( node->kind ) {
     case NODE_ASSIGN: {
-      for( auto it = node->list.rbegin() + 1; it != node->list.rend(); it++ ) {
-        run_lvalue(*it) = run_node(*(it - 1));
-      }
-
-      return run_lvalue(node->expr) = run_node(*node->list.begin());
+      return run_lvalue(node->lhs) = run_node(node->rhs);
     }
 
     case NODE_EXPR: {
