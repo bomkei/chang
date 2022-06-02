@@ -82,7 +82,6 @@
     "typeinfo": "cpp",
     "valarray": "cpp",
     "variant": "cpp",
-    "cassert": "cpp",
-    "locale": "cpp"
+    "cassert": "cpp"
   }
 }

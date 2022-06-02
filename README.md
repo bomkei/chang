@@ -1,9 +1,10 @@
-# Chang ver1.00
-[Join official Discord server](https://discord.gg/5DGkgEMQMT)
+Please read [Coding guide](plrqguide.md) when make your pull-request.
 
-## 概要
-静的型付けスクリプト言語です。
+# chang: A Typed Script Language
+yeah.
 
-## 開発に参加する
-[これ](Contribute.md) を読んでください。
+# 基本的な言語仕様
+関数型。スコープでは、その中の最後に評価されたものがそのスコープの値となる。
 
+# 構文
+## 
